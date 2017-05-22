@@ -1,30 +1,30 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../server').sequelize;
 
-const User = sequelize.define("user", {
+const User = sequelize.define('user', {
   firstName: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
   },
   lastName: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
   },
   username: {
     type: Sequelize.STRING,
-    unique: true
+    unique: true,
   },
   email: {
     type: Sequelize.STRING,
-    unique: true
+    unique: true,
   },
   token: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
   },
   nativeLang: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
   },
   learnLang: {
-    type: Sequelize.STRING
-  }
+    type: Sequelize.STRING,
+  },
 });
 User.sync();
 

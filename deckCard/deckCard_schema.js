@@ -1,13 +1,13 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../server').sequelize;
 
-const DeckCard = sequelize.define("deckCard", {
+const DeckCard = sequelize.define('deckCard', {
   cardId: {
-    type: Sequelize.INTEGER
+    type: Sequelize.INTEGER,
   },
   deckId: {
-    type: Sequelize.INTEGER
-  }
+    type: Sequelize.INTEGER,
+  },
 });
 DeckCard.sync();
 

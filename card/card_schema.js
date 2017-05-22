@@ -2,23 +2,23 @@ const Sequelize = require('sequelize');
 const sequelize = require('../server').sequelize;
 const UserDeck = require('../userDeck/userDeck_schema');
 
-const Card = sequelize.define("Card", {
+const Card = sequelize.define('card', {
   imgUrl: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
   },
   wordMap: {
-    type: Sequelize.JSONB
+    type: Sequelize.JSONB,
   },
   stars: {
-    type: Sequelize.INTEGER
-  }
+    type: Sequelize.INTEGER,
+  },
 }, {
   classMethods: {
-    associate: function(models) {
-      Card.belongsToMany(models.UserDeck, { through: 'DeckCard' }),
-      UserDeck.belongsToMany(models.Card, { through: 'DeckCard' })
-    }
-  }
+    associate: (models) => {
+      Card.belongsToMany(models.UserDeck, { through: 'DeckCard' });
+      UserDeck.belongsToMany(models.Card, { through: 'DeckCard' });
+    },
+  },
 });
 Card.sync();
 

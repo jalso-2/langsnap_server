@@ -1,13 +1,14 @@
 require('dotenv').config();
 const express = require('express');
-const server = express();
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const axios = require('axios');
-const PORT = process.env.PORT || 8080;
 const Sequelize = require('sequelize');
+
+const PORT = process.env.PORT || 8080;
 const sequelize = new Sequelize(`postgres://${process.env.PG_USERNAME}:${process.env.PG_PASSWORD}@localhost:5432/langsnap`);
 module.exports.sequelize = sequelize;
+const server = express();
 
 sequelize
   .authenticate()
@@ -15,20 +16,20 @@ sequelize
     console.log('Connection to Postgres database established successfully.');
     server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
   })
-  .catch(err => {
+  .catch((err) => {
     console.error('Unable to connect to the database:', err);
   });
 
-/////////////////////////// START MIDDLEWARE ///////////////////////////////
+// ///////////////////////// START MIDDLEWARE ///////////////////////////////
 
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: false }));
 server.use(morgan('dev'));
 
-/////////////////////////// END MIDDLEWARE ////////////////////////////////
+// ///////////////////////// END MIDDLEWARE ////////////////////////////////
 
 
-/////////////////////////// START ENDPOINTS ///////////////////////////////
+// ///////////////////////// START ENDPOINTS ///////////////////////////////
 
 const User = require('./user/user_schema');
 const UserDeck = require('./userDeck/userDeck_schema');
@@ -45,10 +46,10 @@ server.post('/user', (req, res) => {
   const username = req.body.username;
   const email = req.body.email;
   User.findOrCreate({ where: { email }, defaults: { firstName, lastName, username } })
-    .then(suc => {
+    .then((suc) => {
       console.log(suc, 'this is success');
       res.status(200).send('Successfully added user to database');
-    })  
+    })
     .catch(err => console.error(err));
 });
 
@@ -57,7 +58,7 @@ server.post('/userdeck', (req, res) => {
   const userId = req.body.userId;
   const stars = 0;
   UserDeck.findOrCreate({ where: { name, userId, stars } })
-    .then(suc => {
+    .then((suc) => {
       console.log(suc, 'this is success creating a user deck');
       res.status(200).send('Successfully added a new deck to database');
     })
@@ -73,4 +74,4 @@ server.post('/card', (req, res) => {
   // Add to join table??? think yes
 });
 
-/////////////////////////// END ENDPOINTS /////////////////////////////////
+// ///////////////////////// END ENDPOINTS /////////////////////////////////
