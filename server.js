@@ -6,7 +6,7 @@ const axios = require('axios');
 const Sequelize = require('sequelize');
 
 const PORT = process.env.PORT || 8080;
-const sequelize = new Sequelize(`postgres://${process.env.PG_USERNAME}:${process.env.PG_PASSWORD}@localhost:5432/langsnap`);
+const sequelize = new Sequelize(process.env.DATABASE_URL);
 module.exports.sequelize = sequelize;
 const server = express();
 
