@@ -164,13 +164,35 @@ UserCardInfo.sync();
 /////////////////////////// START ENDPOINTS ///////////////////////////////
 
 server.get('/', (req, res) => res.status(200).send('hello'));
-server.post('/user/*/*/*/*', (req, res) => {
-  const firstName = req.params[0];
-  const lastName = req.params[1];
-  const username = req.params[2];
-  const email = req.params[3];
-  User.create({firstName, lastName, username, email})
+
+server.post('/user', (req, res) => {
+  const firstName = req.body.firstName;
+  const lastName = req.body.lastName;
+  const username = req.body.username;
+  const email = req.body.email;
+  const user = User.build({ firstName, lastName, username, email });
+  user.save()
     .then(suc => res.status(200).send('Successfully added user to database'))
+    .catch(err => console.error(err));
+});
+
+server.post('/deck', (req, res) => {
+  const name = req.body.name;
+  const userId = req.body.userId;
+  Deck.create({ name, stars: 0, userId })
+    .then(suc => res.status(200).send('Successfully added a new deck to database'))
+    .catch(err => console.error(err));
+});
+
+server.post('/card', (req, res) => {
+  const imgUrl = req.body.imgUrl;
+  const phrase = req.body.phrase;
+  const word = req.body.word;
+  const solution = req.body.solution;
+  const deckId = req.body.deckId;
+  //what to do with deckId and table join???
+  Card.create({ imgUrl, phrase, word, solution })
+    .then(suc => res.status(200).send('Successfully added a new card to the database'))
     .catch(err => console.error(err));
 });
 
