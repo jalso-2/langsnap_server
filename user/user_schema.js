@@ -8,10 +8,6 @@ const User = sequelize.define('user', {
   lastName: {
     type: Sequelize.STRING,
   },
-  username: {
-    type: Sequelize.STRING,
-    unique: true,
-  },
   email: {
     type: Sequelize.STRING,
     unique: true,
@@ -25,7 +21,8 @@ const User = sequelize.define('user', {
   learnLang: {
     type: Sequelize.STRING,
   },
+}, {
+  underscored: true,
 });
-User.sync();
 
 module.exports = User;

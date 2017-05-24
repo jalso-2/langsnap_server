@@ -23,11 +23,23 @@ server.use(morgan('dev'));
 // ///////////////////////// START ENDPOINTS ///////////////////////////////
 
 const User = require('./user/user_schema');
-const UserDeck = require('./userDeck/userDeck_schema');
+const Deck = require('./deck/deck_schema');
 const Card = require('./card/card_schema');
-const DeckCard = require('./deckCard/deckCard_schema');
-const UserCardInfo = require('./userCardInfo/userCardInfo_schema');
+const DeckCard = require('./deck_card/deck_card_schema');
+const UserCard = require('./user_card/user_card_schema');
 
+// Relationships
+User.hasMany(Deck);
+Card.belongsToMany(Deck, { through: DeckCard });
+Card.belongsToMany(User, { through: UserCard });
+Deck.belongsTo(User);
+
+// Perform Sync
+User.sync();
+Deck.sync();
+Card.sync();
+DeckCard.sync();
+UserCard.sync();
 
 server.get('/', (req, res) => res.status(200).send('hello'));
 
@@ -64,5 +76,9 @@ server.post('/card', (req, res) => {
   // After this, add the card to the UserDeck with id and add a UserCardInfo with the id
   // Add to join table??? think yes
 });
+
+// server.get('/v1/decks/deckid/*', (req, res) => {
+
+// });
 
 // ///////////////////////// END ENDPOINTS /////////////////////////////////

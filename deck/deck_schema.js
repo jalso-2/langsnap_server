@@ -1,12 +1,9 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../server').sequelize;
 
-const Card = sequelize.define('card', {
-  imgUrl: {
+const Deck = sequelize.define('deck', {
+  name: {
     type: Sequelize.STRING,
-  },
-  wordMap: {
-    type: Sequelize.JSONB,
   },
   stars: {
     type: Sequelize.INTEGER,
@@ -15,4 +12,4 @@ const Card = sequelize.define('card', {
   underscored: true,
 });
 
-module.exports = Card;
+module.exports = Deck;
