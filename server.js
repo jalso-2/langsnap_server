@@ -35,50 +35,52 @@ Card.belongsToMany(User, { through: UserCard });
 Deck.belongsTo(User);
 
 // Perform Sync
-User.sync();
-Deck.sync();
-Card.sync();
-DeckCard.sync();
-UserCard.sync();
+const syncDb = async () => {
+  await User.sync();
+  await Deck.sync();
+  await Card.sync();
+  await UserCard.sync();
+  await DeckCard.sync();
+};
+syncDb();
 
 server.get('/', (req, res) => res.status(200).send('hello'));
 
-server.post('/user', (req, res) => {
+server.post('/v1/users', async (req, res) => {
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
   const username = req.body.username;
   const email = req.body.email;
-  User.findOrCreate({ where: { email }, defaults: { firstName, lastName, username } })
-    .then((suc) => {
-      console.log(suc, 'this is success');
-      res.status(200).send('Successfully added user to database');
-    })
-    .catch(err => console.error(err));
+  const token = req.body.token;
+  try {
+    const user = await User.findOrCreate({ where: { email }, defaults: { firstName, lastName, username, token } });
+    return res.status(200).send(user[0]);
+  } catch (err) {
+    return console.error(err);
+  }
 });
 
-server.post('/userdeck', (req, res) => {
-  const name = req.body.name;
-  const userId = req.body.userId;
-  const stars = 0;
-  UserDeck.findOrCreate({ where: { name, userId, stars } })
-    .then((suc) => {
-      console.log(suc, 'this is success creating a user deck');
-      res.status(200).send('Successfully added a new deck to database');
-    })
-    .catch(err => console.error(err));
+server.post('/v1/users/addlang', async (req, res) => {
+  const id = req.body.id;
+  const nativeLang = req.body.nativeLang;
+  const learnLang = req.body.learnLang;
+  try {
+    const numUpdated = await User.update({ nativeLang, learnLang }, { where: { id } });
+    if (!numUpdated[0] === 1) {
+      return res.status(400).send('Failed to modify user');
+    }
+    try {
+      const user = await User.findOne({ where: { id } });
+      console.log(user, 'the modified user');
+      return res.status(200).send(user);
+    } catch (error) {
+      return res.status(400).send('Failed to get updated user');
+    }
+  } catch (err) {
+    return res.status(500).send('Error modifying user');
+  }
 });
 
-server.post('/card', (req, res) => {
-  const imgUrl = req.body.imgUrl;
-  const deckId = req.body.deckId;
-  const stars = 0;
-  // Get the wordMap from proper API
-  // After this, add the card to the UserDeck with id and add a UserCardInfo with the id
-  // Add to join table??? think yes
-});
 
-// server.get('/v1/decks/deckid/*', (req, res) => {
-
-// });
 
 // ///////////////////////// END ENDPOINTS /////////////////////////////////
