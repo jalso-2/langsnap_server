@@ -230,21 +230,23 @@ POST /v1/cards/addcard     Used to create a new card object from one the user ha
 
 Request Body Format:
 {
-  "user_id":XXXX,
-  "imgUrl":"XXXX",
-  "wordMap":"{...}",
-  "stars":XXXX,
-  "deck_id":XXXX
+	"user_id":1,
+	"stars":0,
+	"imgUrl":"http???",
+	"wordMap":"{}",
+	"deck_id":2
 }
 
 Response Body Format:
 {
-  "id":XXXX,
-  "imgUrl":"XXXX",
-  "wordMap":"{...}",
-  "stars":XXXX,
-  "deck_id":XXXX
+  "id": 3,
+  "stars": 0,
+  "wordMap": "{}",
+  "imgUrl": "http???",
+  "updated_at": "2017-05-25T19:17:41.675Z",
+  "created_at": "2017-05-25T19:17:41.675Z"
 }
+
 This operation is used to create a new card from user pictures with translations, etc confirmed front side.
 
 
