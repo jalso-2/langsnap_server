@@ -71,15 +71,96 @@ server.post('/v1/users/addlang', async (req, res) => {
     }
     try {
       const user = await User.findOne({ where: { id } });
-      console.log(user, 'the modified user');
       return res.status(200).send(user);
     } catch (error) {
-      return res.status(400).send('Failed to get updated user');
+      return res.status(400).send(error);
     }
   } catch (err) {
-    return res.status(500).send('Error modifying user');
+    return res.status(400).send(err);
   }
 });
+
+server.get('/v1/decks/all', async (req, res) => {  // need to test!
+  try {
+    const decks = await Deck.findAll();  // need to add imgUrl with join on card
+    return res.status(200).send(decks);
+  } catch (err) {
+    return res.status(400).send(err);
+  }
+});
+
+server.get('/v1/decks/deckid/*', async (req, res) => {  // need to test!
+  const id = +req.params[0];
+  try {
+    const decks = await Deck.findAll({ where: { id } });  // need to add imgUrl with join on card
+    return res.status(200).send(decks);
+  } catch (err) {
+    return res.status(400).send(err);
+  }
+});
+
+server.get('/v1/decks/userid/*', async (req, res) => {  // need to test!
+  const id = +req.params[0];
+  try {
+    const decks = await Deck.findAll({ where: { user_id: id } });
+    return res.status(200).send(decks);
+  } catch (err) {
+    return res.status(400).send(err);
+  }
+});
+
+server.get('/v1/cards/all', async (req, res) => {  //need to test!
+  try {
+    const cards = await Card.findAll();
+    return res.status(200).send(cards);
+  } catch (err) {
+    return res.status(400).send(err);
+  }
+});
+
+server.get('/v1/cards/deckid/*', async (req, res) => {  // need to test!
+  const deck_id = +req.params[0];
+  try {
+    const deck = await Deck.findAll({
+      include: [{
+        model: Card,
+        where: { deck_id },
+      }],
+    });
+    console.log(deck, 'what is this!?!?!?');
+    return res.status(200).send(deck);
+  } catch (err) {
+    return res.status(400).send(err);
+  }
+});
+
+server.get('/v1/cards/userid/*', async (req, res) => { // need to test!
+  const user_id = req.params[0];
+  try {
+    const cards = await Card.findAll({
+      include: [{
+        model: User,
+        through: { where: { user_id } },
+      }],
+    });
+    return res.status(200).send({ cards });
+  } catch (err) {
+    return res.status(400).send(err);
+  }
+});
+
+server.post('/v1/decks/new', async (req, res) => {  // need to test!!
+  const name = req.body.name;
+  const user_id = req.body.id;
+  const stars = req.body.stars;
+  try {
+    const deck = await Deck.create({ name, user_id, stars });
+    return res.status(200).send(deck);
+  } catch (err) {
+    return res.status(400).send(err);
+  }
+});
+
 
 
 

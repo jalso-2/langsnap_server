@@ -100,10 +100,10 @@ Response Body Format:
 This operation gets all of the cards in the database for users to select/add desired cards
 
 
-GET /v1/cards/deck/1234/userid/1234    Used to get all cards in a specific deck for a user
+GET /v1/cards/deckid/1234    Used to get all cards in a specific deck for a user
 
 Request Body Format:
-N/A, both deckId and userId are specified in the url
+N/A, deckId specified in the url
 
 Response Body Format: 
 {
