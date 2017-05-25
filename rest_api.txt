@@ -28,15 +28,22 @@ N/A, id of desired deck should be added to the endpoint (in place of 1234 above)
 
 Response Body Format: 
 {
-  "name":"XXXX",          //deck name, String
-  "id":"XXXX",            //userId, String
+  "id": 2,
+  "name": "ZBDeck",
+  "stars": 0,
   "cards": [
     {
-      "id":XXXX,          //cardId, Number
-      "imgUrl":"XXXX",    //String
-      "wordMap":"{...}",  //JSONB object
-      "stars":XXXX        //Number
-    }, ...
+      "id": 2,
+      "imgUrl": "httpZBDECK???",
+      "wordMap": "{}",
+      "stars": 0
+    },
+    {
+      "id": 5,
+      "imgUrl": "http???",
+      "wordMap": "{}",
+      "stars": 0
+    }
   ]
 }
 This operation is to get a single deck of cards back for the user with all card info available
@@ -48,16 +55,21 @@ Request Body Format:
 N/A, request is implicit of getting all decks for all users
 
 Response Body Format: 
-{
-  "decks":"[
-    "{
-      "name":"XXXX",         //String
-      "id":XXXX,             //deckId, Number
-      "stars":XXXX,          //Number
-      "imgUrl":"XXXX"        //String
-    }", ....
-  ]"
-}
+[
+  {
+    "id": 1,
+    "name": "ZDeck",
+    "stars": 0,
+    "cards": [
+      {
+        "imgUrl": "httpZDECK???"
+      },
+      {
+        "imgUrl": "httpZeBrADECK???"
+      }
+    ]
+  }, ...
+]
 This operation is to get all decks from all users back. It includes a picture from a card in the 
 deck to have for a background
 
@@ -68,16 +80,28 @@ Request Body Format:
 N/A, id of user should be added to the endpoint (in place of 1234 above)
 
 Response Body Format: 
-{
-  "decks":"[              //Array of Card objects
-    "{
-      "name":"XXXX",      //String
-      "id":XXXX,          //deckId, Number
-      "stars":XXXX,       //Number
-      "imgUrl":"XXXX"     //String
-    }", ....
-  ]"
-}
+[
+  {
+    "id": 3,
+    "name": "JDeck",
+    "stars": 0,
+    "cards": [
+      {
+        "imgUrl": "httpJDECK???"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "JJDeck",
+    "stars": 0,
+    "cards": [
+      {
+        "imgUrl": "httpJJDECK???"
+      }
+    ]
+  }
+]
 This operation gets all of the decks and card info for those decks for a particular userId
 
 

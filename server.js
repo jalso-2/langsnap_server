@@ -11,17 +11,20 @@ module.exports.sequelize = sequelize;
 const server = express();
 server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
 
-// ///////////////////////// START MIDDLEWARE ///////////////////////////////
 
+
+
+// ///////////////////////// START MIDDLEWARE ///////////////////////////////
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: false }));
 server.use(morgan('dev'));
-
 // ///////////////////////// END MIDDLEWARE ////////////////////////////////
 
 
-// ///////////////////////// START ENDPOINTS ///////////////////////////////
 
+
+
+// ///////////////////////// START DATABASE RELATIONSHIPS ///////////////////
 const User = require('./user/user_schema');
 const Deck = require('./deck/deck_schema');
 const Card = require('./card/card_schema');
@@ -36,7 +39,7 @@ Deck.belongsTo(User);
 Deck.belongsToMany(Card, { through: DeckCard });
 User.belongsToMany(Card, { through: UserCard });
 
-// Perform Sync
+// Perform sync of models with existing database models
 const syncDb = async () => {
   await User.sync();
   await Deck.sync();
@@ -45,24 +48,34 @@ const syncDb = async () => {
   await DeckCard.sync();
 };
 syncDb();
+// /////////////////////// END DATABASE RELATIONSHIPS ///////////////////////
 
+
+
+
+
+// ///////////////////////// START ENDPOINTS ///////////////////////////////
 server.get('/', (req, res) => res.status(200).send('hello'));
 
-server.post('/v1/users', async (req, res) => {
+server.post('/v1/users', async (req, res) => { // goodish, could filter a bit more!
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
   const username = req.body.username;
   const email = req.body.email;
   const token = req.body.token;
   try {
-    const user = await User.findOrCreate({ where: { email }, defaults: { firstName, lastName, username, token } });
+    const user = await User.findOrCreate({
+      where: { email },
+      defaults: { firstName, lastName, username, token },
+      attributes: ['id', 'firstName', 'lastName', 'email', 'nativeLang', 'learnLang'],
+    });
     return res.status(200).send(user[0]);
   } catch (err) {
-    return console.error(err);
+    return res.status(400).send(err);
   }
 });
 
-server.post('/v1/users/addlang', async (req, res) => {
+server.post('/v1/users/addlang', async (req, res) => { // good!
   const id = req.body.id;
   const nativeLang = req.body.nativeLang;
   const learnLang = req.body.learnLang;
@@ -82,29 +95,65 @@ server.post('/v1/users/addlang', async (req, res) => {
   }
 });
 
-server.get('/v1/decks/all', async (req, res) => {  // works correctly but would like to limit
-  try {                                            // amount of join table data returned
-    const decks = await Deck.findAll({ include: [Card] });
+server.get('/v1/decks/all', async (req, res) => {  // good!
+  try {
+    const decks = await Deck.findAll({
+      include: [
+        {
+          model: Card,
+          attributes: ['imgUrl'],
+          through: { attributes: [] },
+        },
+      ],
+      attributes: ['id', 'name', 'stars'],
+    });
     return res.status(200).send(decks);
   } catch (err) {
     return res.status(400).send(err);
   }
 });
 
-server.get('/v1/decks/deckid/*', async (req, res) => {  // same as above, cut down on join results
+server.get('/v1/decks/deckid/*', async (req, res) => {  // good!
   const id = +req.params[0];
   try {
-    const decks = await Deck.findAll({ include: [Card], where: { id } });
-    return res.status(200).send(decks);
+    const decks = await Deck.findAll({
+      include: [
+        {
+          model: Card,
+          attributes: ['id', 'imgUrl', 'wordMap', 'stars'],
+          through: { attributes: [] },
+        },
+      ],
+      where: { id },
+      attributes: ['id', 'name', 'stars'],
+    });
+    if (!decks.length) {
+      return res.status(400).send('Failed to find Deck in Database');
+    }
+    return res.status(200).send(decks[0]);
   } catch (err) {
     return res.status(400).send(err);
   }
 });
 
-server.get('/v1/decks/userid/*', async (req, res) => {  // works but need to filter info returned bad
+server.get('/v1/decks/userid/*', async (req, res) => {  // good!
   const id = +req.params[0];
   try {
-    const decks = await Deck.findAll({ include: [Card, User], where: { user_id: id } });
+    const decks = await Deck.findAll({
+      include: [
+        {
+          model: Card,
+          attributes: ['imgUrl'],
+          through: { attributes: [] },
+        },
+        {
+          model: User,
+          attributes: [],
+        },
+      ],
+      where: { user_id: id },
+      attributes: ['id', 'name', 'stars'],
+    });
     return res.status(200).send(decks);
   } catch (err) {
     return res.status(400).send(err);
@@ -175,7 +224,4 @@ server.post('/v1/cards/addcard', async (req, res) => { // works, condense
     return res.status(400).send(err);
   }
 });
-
-
-
 // ///////////////////////// END ENDPOINTS /////////////////////////////////
