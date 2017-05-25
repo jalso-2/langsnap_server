@@ -46,16 +46,38 @@ syncDb();
 
 server.get('/', (req, res) => res.status(200).send('hello'));
 
-server.post('/v1/user', async (req, res) => {
+server.post('/v1/users', async (req, res) => {
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
   const username = req.body.username;
   const email = req.body.email;
+  const token = req.body.token;
   try {
-    const user = await User.findOrCreate({ where: { email }, defaults: { firstName, lastName, username } });
+    const user = await User.findOrCreate({ where: { email }, defaults: { firstName, lastName, username, token } });
     return res.status(200).send(user[0]);
   } catch (err) {
     return console.error(err);
+  }
+});
+
+server.post('/v1/users/addlang', async (req, res) => {
+  const id = req.body.id;
+  const nativeLang = req.body.nativeLang;
+  const learnLang = req.body.learnLang;
+  try {
+    const numUpdated = await User.update({ nativeLang, learnLang }, { where: { id } });
+    if (!numUpdated[0] === 1) {
+      return res.status(400).send('Failed to modify user');
+    }
+    try {
+      const user = await User.findOne({ where: { id } });
+      console.log(user, 'the modified user');
+      return res.status(200).send(user);
+    } catch (error) {
+      return res.status(400).send('Failed to get updated user');
+    }
+  } catch (err) {
+    return res.status(500).send('Error modifying user');
   }
 });
 
