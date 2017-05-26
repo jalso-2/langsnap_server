@@ -62,6 +62,11 @@ const dbHelpers = require('./db_helpers/db_helpers');
 // ///////////////////////// START ENDPOINTS ///////////////////////////////
 server.get('/', (req, res) => res.status(200).send('hello'));
 
+server.post('/v2/*', (req, res) => {
+  console.log(req.body);
+  return res.sendStatus(200);
+});
+
 server.post('/v1/users', (req, res) => { // goodish, should this be createOrUpdate???
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
