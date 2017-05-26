@@ -300,14 +300,24 @@ DELETE /v1/decks/1234    Used to delete a particular deck from the user account.
 
 Request Body Format:
 N/A, id for the deck to delete should be included in the imgUrl
+http://localhost:3000/v1/decks/5
 
 Response Body Format: 
-{
-  "id":XXXX,              //Number
-  "name":"XXXX",          //String
-  "stars":XXXX,           //Number
-  "userId":"XXXX"         //String
-}
+OK/Internal Server Error
 
 This operation delete the deck of a specified id from the user's account. It also deletes all
 userCardInfo instances that reference that deck.
+
+
+DELETE /v1/cards/1234   Used to delete a card from the database
+
+Request Body Format: 
+card_id is provided in the url
+http://localhost:3000/v1/cards/3
+
+Response Body Format: 
+OK/ Internal Server Error
+
+This operation is used to delete a card from the database. It is cascaded, meaning 
+it removes all references of the card from decks and users when run.
+
