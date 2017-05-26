@@ -101,17 +101,17 @@ server.get('/v1/decks/deckid/*', async (req, res) => {  // same as above, cut do
   }
 });
 
-server.get('/v1/decks/userid/*', async (req, res) => {  // need to test!
+server.get('/v1/decks/userid/*', async (req, res) => {  // works but need to filter info returned bad
   const id = +req.params[0];
   try {
-    const decks = await Deck.findAll({ where: { user_id: id } });
+    const decks = await Deck.findAll({ include: [Card, User], where: { user_id: id } });
     return res.status(200).send(decks);
   } catch (err) {
     return res.status(400).send(err);
   }
 });
 
-server.get('/v1/cards/all', async (req, res) => {  //need to test!
+server.get('/v1/cards/all', async (req, res) => {  //works, filter a bit
   try {
     const cards = await Card.findAll();
     return res.status(200).send(cards);
@@ -120,38 +120,27 @@ server.get('/v1/cards/all', async (req, res) => {  //need to test!
   }
 });
 
-server.get('/v1/cards/deckid/*', async (req, res) => {  // need to test!
-  const deck_id = +req.params[0];
+server.get('/v1/cards/deckid/*', async (req, res) => {  // works, condense results
+  const id = +req.params[0];
   try {
-    const deck = await Deck.findAll({
-      include: [{
-        model: Card,
-        where: { deck_id },
-      }],
-    });
-    console.log(deck, 'what is this!?!?!?');
+    const deck = await Deck.findAll({ include: [Card], where: { id } });
     return res.status(200).send(deck);
   } catch (err) {
     return res.status(400).send(err);
   }
 });
 
-server.get('/v1/cards/userid/*', async (req, res) => { // need to test!
-  const user_id = req.params[0];
+server.get('/v1/cards/userid/*', async (req, res) => { // works so far, want to condense and retest
+  const id = req.params[0];
   try {
-    const cards = await Card.findAll({
-      include: [{
-        model: User,
-        through: { where: { user_id } },
-      }],
-    });
-    return res.status(200).send({ cards });
+    const cards = await User.findAll({ include: [Deck, Card], where: { id } });
+    return res.status(200).send(cards);
   } catch (err) {
     return res.status(400).send(err);
   }
 });
 
-server.post('/v1/decks/new', async (req, res) => {
+server.post('/v1/decks/new', async (req, res) => {  // works, condense
   const name = req.body.name;
   const user_id = req.body.user_id;
   const stars = req.body.stars;
@@ -163,7 +152,7 @@ server.post('/v1/decks/new', async (req, res) => {
   }
 });
 
-server.post('/v1/cards/addcard', async (req, res) => {
+server.post('/v1/cards/addcard', async (req, res) => { // works, condense
   const user_id = req.body.user_id;
   const imgUrl = req.body.imgUrl;
   const wordMap = req.body.wordMap;
