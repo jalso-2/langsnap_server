@@ -28,15 +28,22 @@ N/A, id of desired deck should be added to the endpoint (in place of 1234 above)
 
 Response Body Format: 
 {
-  "name":"XXXX",          //deck name, String
-  "id":"XXXX",            //userId, String
+  "id": 2,
+  "name": "ZBDeck",
+  "stars": 0,
   "cards": [
     {
-      "id":XXXX,          //cardId, Number
-      "imgUrl":"XXXX",    //String
-      "wordMap":"{...}",  //JSONB object
-      "stars":XXXX        //Number
-    }, ...
+      "id": 2,
+      "imgUrl": "httpZBDECK???",
+      "wordMap": "{}",
+      "stars": 0
+    },
+    {
+      "id": 5,
+      "imgUrl": "http???",
+      "wordMap": "{}",
+      "stars": 0
+    }
   ]
 }
 This operation is to get a single deck of cards back for the user with all card info available
@@ -48,16 +55,21 @@ Request Body Format:
 N/A, request is implicit of getting all decks for all users
 
 Response Body Format: 
-{
-  "decks":"[
-    "{
-      "name":"XXXX",         //String
-      "id":XXXX,             //deckId, Number
-      "stars":XXXX,          //Number
-      "imgUrl":"XXXX"        //String
-    }", ....
-  ]"
-}
+[
+  {
+    "id": 1,
+    "name": "ZDeck",
+    "stars": 0,
+    "cards": [
+      {
+        "imgUrl": "httpZDECK???"
+      },
+      {
+        "imgUrl": "httpZeBrADECK???"
+      }
+    ]
+  }, ...
+]
 This operation is to get all decks from all users back. It includes a picture from a card in the 
 deck to have for a background
 
@@ -68,16 +80,28 @@ Request Body Format:
 N/A, id of user should be added to the endpoint (in place of 1234 above)
 
 Response Body Format: 
-{
-  "decks":"[              //Array of Card objects
-    "{
-      "name":"XXXX",      //String
-      "id":XXXX,          //deckId, Number
-      "stars":XXXX,       //Number
-      "imgUrl":"XXXX"     //String
-    }", ....
-  ]"
-}
+[
+  {
+    "id": 3,
+    "name": "JDeck",
+    "stars": 0,
+    "cards": [
+      {
+        "imgUrl": "httpJDECK???"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "JJDeck",
+    "stars": 0,
+    "cards": [
+      {
+        "imgUrl": "httpJJDECK???"
+      }
+    ]
+  }
+]
 This operation gets all of the decks and card info for those decks for a particular userId
 
 
@@ -87,16 +111,23 @@ Request Body Format:
 N/A, assumed app-wide search
 
 Response Body Format:
-{
-  "cards":"[
-    "{
-      "id":XXXX,               //Number
-      "imgUrl":"XXXX",         //String
-      "wordMap":"{...}",       //JSONB object
-      "stars":XXXX             //Number
-    }", ...
-  ]"
-}
+[
+  {
+    "id": 1,
+    "imgUrl": "httpZDECK???",
+    "stars": 0
+  },
+  {
+    "id": 2,
+    "imgUrl": "httpZBDECK???",
+    "stars": 0
+  },
+  {
+    "id": 3,
+    "imgUrl": "httpJDECK???",
+    "stars": 0
+  }
+]
 This operation gets all of the cards in the database for users to select/add desired cards
 
 
@@ -106,37 +137,37 @@ Request Body Format:
 N/A, deckId specified in the url
 
 Response Body Format: 
-{
-  "cards":"[
-    "{
-      "id":XXXX,
-      "imgUrl":"XXXX",
-      "wordMap":"{...}",
-      "stars":XXXX,
-      "deck_id":XXXX
-    }", ...
-  ]"
-}
+[
+  {
+    "id": 2,
+    "name": "ZBDeck",
+    "cards": [
+      {
+        "id": 2,
+        "imgUrl": "httpZBDECK???",
+        "wordMap": "{}",
+        "stars": 0,
+        "deck_card": {
+          "lastVisited": null,
+          "timeInterval": null,
+          "phrase": null
+        }
+      },
+      {
+        "id": 5,
+        "imgUrl": "http???",
+        "wordMap": "{}",
+        "stars": 0,
+        "deck_card": {
+          "lastVisited": null,
+          "timeInterval": null,
+          "phrase": null
+        }
+      }
+    ]
+  }
+]
 This operation is used to query only the cards in a specific user's deck
-
-
-GET /v1/cards/userid/1234     Used to get all cards for a specific user
-
-Request Body Format: 
-N/A, specify the userId for query and returns all cards for userId
-
-Response Body Format: 
-{
-  "cards":"[                   //Array of Card objects
-    "{
-      "id":XXXX,               //Number
-      "imgUrl":"XXXX",         //String
-      "wordMap":"{...}",       //JSONB object
-      "stars":XXXX             //Number
-    }", ...
-  ]"
-}
-This operation is to get all of the cards that are for a specific user.
 
 
 POST /v1/users    Used to create a new user in the database, should be done after authenticating
@@ -198,14 +229,29 @@ POST /v1/decks/adddecks  Used to copy multiple decks from another user to add th
 
 Request Body Format: 
 {
-  "id":XXXX,             //userId, Number
-  "decks":"[    
-      XXXX, ...          //deckId, Number
-  ]"
+	"id":4,
+	"decks":"[3,4]"
 }
 
 Response Body Format: 
-200/400/500
+[
+  {
+    "id": 15,
+    "user_id": 4,
+    "name": "JDeck",
+    "stars": 0,
+    "updated_at": "2017-05-26T02:02:53.069Z",
+    "created_at": "2017-05-26T02:02:53.069Z"
+  },
+  {
+    "id": 16,
+    "user_id": 4,
+    "name": "JJDeck",
+    "stars": 0,
+    "updated_at": "2017-05-26T02:02:53.069Z",
+    "created_at": "2017-05-26T02:02:53.069Z"
+  }
+]
 This operation creates many new decks for the desired user. It also finds all cards with the deckId and creates 
 a new copy of each that then references the deckId of the new users new deck that was created.
 
@@ -254,14 +300,24 @@ DELETE /v1/decks/1234    Used to delete a particular deck from the user account.
 
 Request Body Format:
 N/A, id for the deck to delete should be included in the imgUrl
+http://localhost:3000/v1/decks/5
 
 Response Body Format: 
-{
-  "id":XXXX,              //Number
-  "name":"XXXX",          //String
-  "stars":XXXX,           //Number
-  "userId":"XXXX"         //String
-}
+OK/Internal Server Error
 
 This operation delete the deck of a specified id from the user's account. It also deletes all
 userCardInfo instances that reference that deck.
+
+
+DELETE /v1/cards/1234   Used to delete a card from the database
+
+Request Body Format: 
+card_id is provided in the url
+http://localhost:3000/v1/cards/3
+
+Response Body Format: 
+OK/ Internal Server Error
+
+This operation is used to delete a card from the database. It is cascaded, meaning 
+it removes all references of the card from decks and users when run.
+
