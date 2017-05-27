@@ -6,17 +6,62 @@ const DeckCard = require('./deck_card/deck_card_schema');
 const UserCard = require('./user_card/user_card_schema');
 
 module.exports = {
-  userAddLanguageInfo: async (id, nativeLang, learnLang, res) => {
+  findUserIfExistsBySocialId: async (socialLoginSource, username, res) => {
     try {
-      const numUpdated = await User.update({ nativeLang, learnLang }, { where: { id } });
-      if (!numUpdated[0] === 1) {
-        return res.status(400).send('Failed to modify user');
+      const user = await User.findOne({ where: { facebookUsername: username } });
+      if (user === null) {
+        return res.status(200).send({});
       }
-      try {
-        const user = await User.findOne({ where: { id } });
-        return res.status(200).send(user);
-      } catch (error) {
-        return res.status(400).send(error);
+      return res.status(200).send(user);
+    } catch (err) {
+      return res.sendStatus(500);
+    }
+  },
+  findAndUpdateOrCreateUser: async (
+    facebookUsername,
+    firstName,
+    lastName,
+    token,
+    nativeLang,
+    learnLang,
+    email,
+    res) => {
+    try {
+      let user = await User.findOrCreate({
+        where: { facebookUsername },
+        defaults: {
+          facebookUsername,
+          firstName,
+          lastName,
+          token,
+          nativeLang,
+          learnLang,
+          email,
+        },
+      });
+      if (!user[1]) {
+        try {
+          user = await User.update({
+            firstName,
+            lastName,
+            token,
+            nativeLang,
+            learnLang,
+            email,
+          }, {
+            where: { facebookUsername },
+          });
+          try {
+            user = await User.findOne({ where: { facebookUsername } });
+            return res.status(200).send(user);
+          } catch (erro) {
+            return res.status(400).send(erro);
+          }
+        } catch (error) {
+          return res.status(400).send(error);
+        }
+      } else {
+        return res.status(200).send(user[0]);
       }
     } catch (err) {
       return res.status(400).send(err);

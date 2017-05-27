@@ -20,23 +20,16 @@ router.post('/v2/*', (req, res) => {
   return res.sendStatus(200);
 });
 
-router.get('/v1/users/auth/*/*', async (req, res) => {
+router.get('/v1/users/auth/*/*', (req, res) => {
+  const socialLoginSource = req.params[0];
   const username = req.params[1];
-  if (req.params[0] === 'facebook') {
-    try {
-      const user = await User.findOne({ where: { facebookUsername: username } });
-      if (user === null) {
-        return res.status(200).send({});
-      }
-      return res.status(200).send(user);
-    } catch (err) {
-      return res.sendStatus(500);
-    }
+  if (socialLoginSource === 'facebook') {
+    return dbHelpers.findUserIfExistsBySocialId(socialLoginSource, username, res);
   }
-  return res.sendStatus(500);
+  return res.sendStatus(400);
 });
 
-router.post('/v1/users/findorcreate', async (req, res) => {  // fix this!!!!
+router.post('/v1/users/findorcreate', async (req, res) => {
   const facebookUsername = req.body.facebookUsername;
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
@@ -44,53 +37,15 @@ router.post('/v1/users/findorcreate', async (req, res) => {  // fix this!!!!
   const nativeLang = req.body.nativeLang;
   const learnLang = req.body.learnLang;
   const email = req.body.email;
-  try {
-    let user = await User.findOrCreate({
-      where: { facebookUsername },
-      defaults: {
-        facebookUsername,
-        firstName,
-        lastName,
-        token,
-        nativeLang,
-        learnLang,
-        email,
-      },
-    });
-    if (!user[1]) {
-      try {
-        user = await User.update({
-          firstName,
-          lastName,
-          token,
-          nativeLang,
-          learnLang,
-          email,
-        }, {
-          where: { facebookUsername },
-        });
-        try {
-          user = await User.findOne({ where: { facebookUsername } });
-          return res.status(200).send(user);
-        } catch (erro) {
-          return res.status(400).send(erro);
-        }
-      } catch (error) {
-        return res.status(400).send(error);
-      }
-    } else {
-      return res.status(200).send(user[0]);
-    }
-  } catch (err) {
-    return res.status(400).send(err);
-  }
-});
-
-router.post('/v1/users/addlang', (req, res) => { // good!
-  const id = req.body.id;
-  const nativeLang = req.body.nativeLang;
-  const learnLang = req.body.learnLang;
-  return dbHelpers.userAddLanguageInfo(id, nativeLang, learnLang, res);
+  return dbHelpers.findAndUpdateOrCreateUser(
+    facebookUsername,
+    firstName,
+    lastName,
+    token,
+    nativeLang,
+    learnLang,
+    email,
+    res);
 });
 
 router.get('/v1/decks/all', (req, res) => dbHelpers.getAllDecks(res)); // good!
