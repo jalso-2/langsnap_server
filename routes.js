@@ -1,10 +1,10 @@
 const express = require('express');
 
 const router = express.Router();
-const dbHelpers = require('./db_helpers/db_helpers');
-const Card = require('./card/card_schema');
-const Deck = require('./deck/deck_schema');
-const User = require('./user/user_schema');
+const dbHelpers = require('./db_schema/db_helpers_fxns');
+const Card = require('./db_schema/card/card_schema');
+const Deck = require('./db_schema/deck/deck_schema');
+const User = require('./db_schema/user/user_schema');
 
 router.options('/*', (req, res) => {
   res.header('Access-Control-Allow-Origin', '*');

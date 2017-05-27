@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require('../server').sequelize;
+const sequelize = require('../../server').sequelize;
 
 const User = sequelize.define('user', {
   facebookUsername: {

@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require('../server').sequelize;
+const sequelize = require('../../server').sequelize;
 
 const Deck = sequelize.define('deck', {
   name: {

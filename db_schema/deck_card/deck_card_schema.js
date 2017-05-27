@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require('../server').sequelize;
+const sequelize = require('../../server').sequelize;
 
 const DeckCard = sequelize.define('deck_card', {
   lastVisited: {
