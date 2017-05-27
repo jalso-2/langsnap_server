@@ -24,7 +24,10 @@ router.get('/v1/users/auth/*/*', async (req, res) => {
   const username = req.params[1];
   if (req.params[0] === 'facebook') {
     try {
-      const user = await User.find({ where: { facebookUsername: username } });
+      const user = await User.findOne({ where: { facebookUsername: username } });
+      if (user === null) {
+        return res.status(200).send({});
+      }
       return res.status(200).send(user);
     } catch (err) {
       return res.sendStatus(500);
