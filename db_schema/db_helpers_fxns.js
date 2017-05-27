@@ -1,8 +1,9 @@
-const User = require('../user/user_schema');
-const Card = require('../card/card_schema');
-const Deck = require('../deck/deck_schema');
-const DeckCard = require('../deck_card/deck_card_schema');
-const UserCard = require('../user_card/user_card_schema');
+const bluebird = require('bluebird');
+const User = require('./user/user_schema');
+const Card = require('./card/card_schema');
+const Deck = require('./deck/deck_schema');
+const DeckCard = require('./deck_card/deck_card_schema');
+const UserCard = require('./user_card/user_card_schema');
 
 module.exports = {
   userAddLanguageInfo: async (id, nativeLang, learnLang, res) => {
