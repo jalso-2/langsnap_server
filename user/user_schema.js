@@ -2,6 +2,10 @@ const Sequelize = require('sequelize');
 const sequelize = require('../server').sequelize;
 
 const User = sequelize.define('user', {
+  facebookUsername: {
+    type: Sequelize.STRING,
+    unique: true,
+  },
   firstName: {
     type: Sequelize.STRING,
   },
@@ -10,7 +14,6 @@ const User = sequelize.define('user', {
   },
   email: {
     type: Sequelize.STRING,
-    unique: true,
   },
   token: {
     type: Sequelize.STRING,
