@@ -60,6 +60,13 @@ const dbHelpers = require('./db_helpers/db_helpers');
 
 
 // ///////////////////////// START ENDPOINTS ///////////////////////////////
+server.options('/*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+  return res.send(200);
+});
+
 server.get('/', (req, res) => res.status(200).send('hello'));
 
 server.post('/v2/*', (req, res) => {
@@ -67,13 +74,67 @@ server.post('/v2/*', (req, res) => {
   return res.sendStatus(200);
 });
 
-server.post('/v1/users', (req, res) => { // goodish, should this be createOrUpdate???
+server.get('/v1/users/auth/*/*', async (req, res) => {
+  const username = req.params[1];
+  if (req.params[0] === 'facebook') {
+    try {
+      const user = await User.find({ where: { facebookUsername: username } });
+      return res.status(200).send(user);
+    } catch (err) {
+      return res.sendStatus(500);
+    }
+  }
+  return res.sendStatus(500);
+});
+
+server.post('/v1/users/findorcreate', async (req, res) => {  // fix this!!!!
+  const facebookUsername = req.body.facebookUsername;
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
-  const username = req.body.username;
-  const email = req.body.email;
   const token = req.body.token;
-  return dbHelpers.findOrCreateUser(firstName, lastName, username, email, token, res);
+  const nativeLang = req.body.nativeLang;
+  const learnLang = req.body.learnLang;
+  const email = req.body.email;
+  try {
+    let user = await User.findOrCreate({
+      where: { facebookUsername },
+      defaults: {
+        facebookUsername,
+        firstName,
+        lastName,
+        token,
+        nativeLang,
+        learnLang,
+        email,
+      },
+    });
+    if (!user[1]) {
+      try {
+        user = await User.update({
+          firstName,
+          lastName,
+          token,
+          nativeLang,
+          learnLang,
+          email,
+        }, {
+          where: { facebookUsername },
+        });
+        try {
+          user = await User.findOne({ where: { facebookUsername } });
+          return res.status(200).send(user);
+        } catch (erro) {
+          return res.status(400).send(erro);
+        }
+      } catch (error) {
+        return res.status(400).send(error);
+      }
+    } else {
+      return res.status(200).send(user[0]);
+    }
+  } catch (err) {
+    return res.status(400).send(err);
+  }
 });
 
 server.post('/v1/users/addlang', (req, res) => { // good!

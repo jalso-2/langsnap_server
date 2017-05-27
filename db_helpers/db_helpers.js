@@ -5,18 +5,6 @@ const DeckCard = require('../deck_card/deck_card_schema');
 const UserCard = require('../user_card/user_card_schema');
 
 module.exports = {
-  findOrCreateUser: async (firstName, lastName, username, email, token, res) => {
-    try {
-      const user = await User.findOrCreate({
-        where: { email },
-        defaults: { firstName, lastName, username, token },
-        attributes: ['id', 'firstName', 'lastName', 'email', 'nativeLang', 'learnLang'],
-      });
-      return res.status(200).send(user[0]);
-    } catch (err) {
-      return res.status(400).send(err);
-    }
-  },
   userAddLanguageInfo: async (id, nativeLang, learnLang, res) => {
     try {
       const numUpdated = await User.update({ nativeLang, learnLang }, { where: { id } });
