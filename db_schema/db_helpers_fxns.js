@@ -6,6 +6,22 @@ const DeckCard = require('./deck_card/deck_card_schema');
 const UserCard = require('./user_card/user_card_schema');
 
 module.exports = {
+  getAllCardsFromDeckByDeckId: async (id, res) => {
+    try {
+      const deck = await Deck.findAll({
+        include: [{
+          model: Card,
+          attributes: ['id', 'imgUrl', 'wordMap', 'stars'],
+          through: { attributes: ['lastVisited', 'timeInterval', 'phrase'] },
+        }],
+        where: { id },
+        attributes: ['id', 'name'],
+      });
+      return res.status(200).send(deck);
+    } catch (err) {
+      return res.status(400).send(err);
+    }
+  },
   findUserIfExistsBySocialId: async (socialLoginSource, username, res) => {
     try {
       const user = await User.findOne({ where: { facebookUsername: username } });
