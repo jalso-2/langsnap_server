@@ -55,8 +55,8 @@ module.exports = {
     axios.get(`https://od-api.oxforddictionaries.com:443/api/v1/entries/en/${queryWord}/sentences`, {
       headers: {
         Accept: 'application/json',
-        app_id: 'fde9a8eb',
-        app_key: '1423fd6c80bb56d9aacfd7f2e6c8e286',
+        app_id: process.env.OXFORD_APP_ID,
+        app_key: process.env.OXFORD_APP_KEY,
       },
     })
       .then(response => res.status(200).send(response.data))
