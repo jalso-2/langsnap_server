@@ -10,7 +10,7 @@ router.options('/*', (req, res) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-  return res.send(200);
+  return res.sendStatus(200);
 });
 
 router.get('/', (req, res) => res.status(200).send('hello'));
@@ -18,6 +18,36 @@ router.get('/', (req, res) => res.status(200).send('hello'));
 router.post('/v2/*', (req, res) => {
   console.log(req.body);
   return res.sendStatus(200);
+});
+
+router.post('/v1/cloudinaryurltogoogle', (req, res) => {
+  const url = req.body.url;
+  console.log(url);
+  dbHelpers.sendUrlToGoogleVisionForName(url, res);
+});
+
+// testing only delete when done
+router.get('/v1/users/all', async (req, res) => {
+  const user = await User.findAll({});
+  return res.status(200).send(user);
+});
+
+
+router.get('/v1/oxford/sentence/word/*', (req, res) => {
+  const queryWord = req.params[0];
+  return dbHelpers.getSamplePhraseEnglishFromWordOxford(queryWord, res);
+});
+
+router.get('/v1/wordnik/sentence/word/*', (req, res) => {
+  const queryWord = req.params[0];
+  return dbHelpers.getSamplePhraseFromWordWordnik(queryWord, res);
+});
+
+router.post('/v1/googletranslate/sentence', (req, res) => {
+  const q = req.body.q;
+  const source = req.body.source;
+  const target = req.body.target;
+  return dbHelpers.getGoogleTranslateOfSentence(q, source, target, res);
 });
 
 router.get('/v1/users/auth/*/*', (req, res) => {
@@ -64,20 +94,7 @@ router.get('/v1/cards/all', (req, res) => dbHelpers.getAllCards(res));
 
 router.get('/v1/cards/deckid/*', async (req, res) => {  // good!
   const id = +req.params[0];
-  try {
-    const deck = await Deck.findAll({
-      include: [{
-        model: Card,
-        attributes: ['id', 'imgUrl', 'wordMap', 'stars'],
-        through: { attributes: ['lastVisited', 'timeInterval', 'phrase'] },
-      }],
-      where: { id },
-      attributes: ['id', 'name'],
-    });
-    return res.status(200).send(deck);
-  } catch (err) {
-    return res.status(400).send(err);
-  }
+  return dbHelpers.getAllCardsFromDeckByDeckId(id, res);
 });
 
 router.post('/v1/decks/new', (req, res) => {  // good!
@@ -109,8 +126,8 @@ router.post('/v1/decks/adddecks', async (req, res) => {
       } catch (err) {
         return res.status(400).send(err);
       }
-    } catch (error) {
-      return res.status(400).send('error');
+    } catch (erro) {
+      return res.status(400).send(erro);
     }
   }));
   return res.status(200).send(createdDecksOutput);
