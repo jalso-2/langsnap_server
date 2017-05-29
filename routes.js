@@ -20,6 +20,19 @@ router.post('/v2/*', (req, res) => {
   return res.sendStatus(200);
 });
 
+router.post('/v1/cloudinaryurltogoogle', (req, res) => {
+  const url = req.body.url;
+  console.log(url);
+  dbHelpers.sendUrlToGoogleVisionForName(url, res);
+});
+
+// testing only delete when done
+router.get('/v1/users/all', async (req, res) => {
+  const user = await User.findAll({});
+  return res.status(200).send(user);
+});
+
+
 router.get('/v1/oxford/sentence/word/*', (req, res) => {
   const queryWord = req.params[0];
   return dbHelpers.getSamplePhraseEnglishFromWordOxford(queryWord, res);

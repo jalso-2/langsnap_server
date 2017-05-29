@@ -7,6 +7,34 @@ const DeckCard = require('./deck_card/deck_card_schema');
 const UserCard = require('./user_card/user_card_schema');
 
 module.exports = {
+  sendUrlToGoogleVisionForName: (url, res) => {
+    axios({
+      method: 'post',
+      url: `https://vision.googleapis.com/v1/images:annotate?key=${process.env.GOOGLE_VISION_KEY}`,
+      data: {
+        requests: [
+          {
+            image: {
+              source: {
+                imageUri:
+                  url,
+              },
+            },
+            features: [
+              {
+                type: 'LABEL_DETECTION',
+                maxResults: 5,
+              },
+            ],
+          },
+        ],
+      },
+    })
+    .then(resp =>
+      res.status(200).send(resp.data.responses[0].labelAnnotations[0].description))
+    .catch(err =>
+      res.status(400).send(err));
+  },
   getGoogleTranslateOfSentence: (q, source, target, res) => {
     axios.post(`https://translation.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_VISION}`,
       {
