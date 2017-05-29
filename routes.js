@@ -20,6 +20,23 @@ router.post('/v2/*', (req, res) => {
   return res.sendStatus(200);
 });
 
+router.get('/v1/oxford/sentence/word/*', (req, res) => {
+  const queryWord = req.params[0];
+  return dbHelpers.getSamplePhraseEnglishFromWordOxford(queryWord, res);
+});
+
+router.get('/v1/wordnik/sentence/word/*', (req, res) => {
+  const queryWord = req.params[0];
+  return dbHelpers.getSamplePhraseFromWordWordnik(queryWord, res);
+});
+
+router.post('/v1/googletranslate/sentence', (req, res) => {
+  const q = req.body.q;
+  const source = req.body.source;
+  const target = req.body.target;
+  return dbHelpers.getGoogleTranslateOfSentence(q, source, target, res);
+});
+
 router.get('/v1/users/auth/*/*', (req, res) => {
   const socialLoginSource = req.params[0];
   const username = req.params[1];
