@@ -23,3 +23,5 @@ const syncDb = async () => {
   await DeckCard.sync();
 };
 syncDb();
+
+require('./db_seeder/db_seeder');
