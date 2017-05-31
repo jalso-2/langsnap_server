@@ -6,6 +6,7 @@ const apiHelpers = require('./api_helpers/api_helpers');
 const Card = require('./db_schema/card/card_schema');
 const Deck = require('./db_schema/deck/deck_schema');
 const User = require('./db_schema/user/user_schema');
+const DeckCard = require('./db_schema/deck_card/deck_card_schema');
 
 router.options('/*', (req, res) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -27,12 +28,6 @@ router.post('/v1/cloudinaryurltogoogle', (req, res) => {
   apiHelpers.sendUrlToGoogleVisionForName(url, res);
 });
 
-// testing only delete when done
-router.get('/v1/users/all', async (req, res) => {
-  const user = await User.findAll({});
-  return res.status(200).send(user);
-});
-
 router.get('/v1/oxford/sentence/word/*', (req, res) => {
   const queryWord = req.params[0];
   return apiHelpers.getSamplePhraseEnglishFromWordOxford(queryWord, res);
@@ -50,10 +45,15 @@ router.post('/v1/googletranslate/sentence', (req, res) => {
   return apiHelpers.getGoogleTranslateOfSentence(q, source, target, res);
 });
 
+// testing only delete when done
+router.get('/v1/users/all', async (req, res) => {
+  const user = await User.findAll({});
+  return res.status(200).send(user);
+});
+
 router.get('/v1/users/auth/*/*', (req, res) => {
   const socialLoginSource = req.params[0];
   const username = decodeURI(req.params[1]);
-  console.log(username, 'this is jay username');
   if (socialLoginSource === 'facebook') {
     return dbHelpers.findUserIfExistsBySocialId(socialLoginSource, username, res);
   }
@@ -79,7 +79,7 @@ router.post('/v1/users/findorcreate', async (req, res) => {
     res);
 });
 
-router.get('/v1/decks/all', (req, res) => dbHelpers.getAllDecks(res)); // good!
+router.get('/v1/decks/all', (req, res) => dbHelpers.getAllDecks(res)); // getting cards array, why? seeded data?
 
 router.get('/v1/decks/deckid/*', (req, res) => {  // good!
   const id = +req.params[0];
@@ -91,9 +91,9 @@ router.get('/v1/decks/userid/*', (req, res) => {  // good!
   return dbHelpers.getDeckByUserId(id, res);
 });
 
-router.get('/v1/cards/all', (req, res) => dbHelpers.getAllCards(res));
+router.get('/v1/cards/all', (req, res) => dbHelpers.getAllCards(res));  // good
 
-router.get('/v1/cards/deckid/*', async (req, res) => {  // good!
+router.get('/v1/cards/deckid/*', (req, res) => {  // need to test with proper data again
   const id = +req.params[0];
   return dbHelpers.getAllCardsFromDeckByDeckId(id, res);
 });
@@ -105,7 +105,7 @@ router.post('/v1/decks/new', (req, res) => {  // good!
   return dbHelpers.userCreateNewDeck(name, user_id, stars, res);
 });
 
-router.post('/v1/cards/addcard', (req, res) => { // works, condense, default join table
+router.post('/v1/cards/addcard', (req, res) => { // working! leave it def for now!!!
   const user_id = req.body.user_id;
   const imgUrl = req.body.imgUrl;
   const wordMap = req.body.wordMap;
@@ -113,44 +113,24 @@ router.post('/v1/cards/addcard', (req, res) => { // works, condense, default joi
   return dbHelpers.userAddCreatedCardToDeck(user_id, imgUrl, wordMap, deck_id, res);
 });
 
-router.post('/v1/decks/adddecks', async (req, res) => {
+router.post('/v1/decks/adddecks', (req, res) => {  // I think this one works!
   const user_id = req.body.id;
   const decks = JSON.parse(req.body.decks);
-  const createdDecksOutput = [];
-  await Promise.all(decks.map(async (deckId) => {
-    try {
-      const originalDeck = await Deck.findOne({ where: { id: deckId } });
-      const name = originalDeck.name;
-      try {
-        const createdDeck = await Deck.create({ user_id, name, stars: 0 });
-        return createdDecksOutput.push(createdDeck);
-      } catch (err) {
-        return res.status(400).send(err);
-      }
-    } catch (erro) {
-      return res.status(400).send(erro);
-    }
-  }));
-  return res.status(200).send(createdDecksOutput);
+  return dbHelpers.addMultipleDecksAndUserSpecificsToJoinTable(user_id, decks, res);
 });
 
-router.post('/v1/decks/addcards', async (req, res) => {  // need to FIX!!!, should add user spec info to join table!!!!
+router.post('/v1/decks/addcards', (req, res) => {
   const deckId = req.body.deckId;
   const cardIdsArr = JSON.parse(req.body.cardIds);
-  try {
-    await dbHelpers.createCardsForDeckByCardIds(deckId, cardIdsArr, res);
-    return res.sendStatus(200);
-  } catch (err) {
-    return res.status(400).send(err);
-  }
+  return dbHelpers.createCardsForDeckByCardIds(deckId, cardIdsArr, res);
 });
 
-router.delete('/v1/decks/*', async (req, res) => {  // good!
+router.delete('/v1/decks/*', (req, res) => {  // good!
   const id = +req.params[0];
   return dbHelpers.deleteDeckById(id, res);
 });
 
-router.delete('/v1/cards/*', async (req, res) => {  // good!
+router.delete('/v1/cards/*', (req, res) => {  // good!
   const id = req.params[0];
   return dbHelpers.deleteCardById(id, res);
 });
