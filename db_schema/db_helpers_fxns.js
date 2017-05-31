@@ -5,6 +5,21 @@ const Deck = require('./deck/deck_schema');
 const DeckCard = require('./deck_card/deck_card_schema');
 
 module.exports = {
+  userGetItAll: async (res) => {
+    try {
+      const everything = await Deck.findAll({
+        where: {},
+        include: [
+          {
+            model: Card,
+          },
+        ],
+      });
+      return res.status(200).send(everything);
+    } catch (err) {
+      return res.status(400).send(err);
+    }
+  },
   getAllCardsFromDeckByDeckId: async (id, res) => {
     try {
       const deck = await Deck.findAll({
@@ -224,7 +239,6 @@ module.exports = {
         });
         await Promise.all(joinTableCardIdsArr.map(async (joinObj) => {
           const card = await Card.findOne({ where: { id: joinObj.card_id } });
-          // const user = await User.findOne({ where: { id: user_id } });
           await card.addUser(user_id);
           await createdDeck.addCard(card, {
             timeInterval: 3000,

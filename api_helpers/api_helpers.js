@@ -25,7 +25,7 @@ module.exports = {
       },
     })
     .then(resp =>
-      res.status(200).send(resp.data.responses[0].labelAnnotations[0].description))
+      res.status(200).send(resp.data.responses[0].labelAnnotations))
     .catch(err =>
       res.status(400).send(err));
   },
