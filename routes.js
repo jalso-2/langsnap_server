@@ -93,7 +93,7 @@ router.get('/v1/decks/userid/*', (req, res) => {  // good!
 
 router.get('/v1/cards/all', (req, res) => dbHelpers.getAllCards(res));  // good
 
-router.get('/v1/cards/deckid/*', async (req, res) => {  // need to test with proper data again
+router.get('/v1/cards/deckid/*', (req, res) => {  // need to test with proper data again
   const id = +req.params[0];
   return dbHelpers.getAllCardsFromDeckByDeckId(id, res);
 });
@@ -105,7 +105,7 @@ router.post('/v1/decks/new', (req, res) => {  // good!
   return dbHelpers.userCreateNewDeck(name, user_id, stars, res);
 });
 
-router.post('/v1/cards/addcard', (req, res) => { // maybe fixed???
+router.post('/v1/cards/addcard', (req, res) => { // working! leave it def for now!!!
   const user_id = req.body.user_id;
   const imgUrl = req.body.imgUrl;
   const wordMap = req.body.wordMap;
@@ -113,44 +113,24 @@ router.post('/v1/cards/addcard', (req, res) => { // maybe fixed???
   return dbHelpers.userAddCreatedCardToDeck(user_id, imgUrl, wordMap, deck_id, res);
 });
 
-router.post('/v1/decks/adddecks', async (req, res) => {  // how to add extra deets to join table????
-  const user_id = req.body.id;  // does this need a double promise map????
+router.post('/v1/decks/adddecks', (req, res) => {  // I think this one works!
+  const user_id = req.body.id;
   const decks = JSON.parse(req.body.decks);
-  const createdDecksOutput = [];
-  await Promise.all(decks.map(async (deckId) => {
-    try {
-      const originalDeck = await Deck.findOne({ where: { id: deckId } });
-      const name = originalDeck.name;
-      try {
-        const createdDeck = await Deck.create({ user_id, name, stars: 0 });
-        return createdDecksOutput.push(createdDeck);
-      } catch (err) {
-        return res.status(400).send(err);
-      }
-    } catch (erro) {
-      return res.status(400).send(erro);
-    }
-  }));
-  return res.status(200).send(createdDecksOutput);
+  return dbHelpers.addMultipleDecksAndUserSpecificsToJoinTable(user_id, decks, res);
 });
 
-router.post('/v1/decks/addcards', async (req, res) => {  // need to FIX!!!, should add user spec info to join table!!!!
+router.post('/v1/decks/addcards', (req, res) => {
   const deckId = req.body.deckId;
   const cardIdsArr = JSON.parse(req.body.cardIds);
-  try {
-    await dbHelpers.createCardsForDeckByCardIds(deckId, cardIdsArr, res);
-    return res.sendStatus(200);
-  } catch (err) {
-    return res.status(400).send(err);
-  }
+  return dbHelpers.createCardsForDeckByCardIds(deckId, cardIdsArr, res);
 });
 
-router.delete('/v1/decks/*', async (req, res) => {  // good!
+router.delete('/v1/decks/*', (req, res) => {  // good!
   const id = +req.params[0];
   return dbHelpers.deleteDeckById(id, res);
 });
 
-router.delete('/v1/cards/*', async (req, res) => {  // good!
+router.delete('/v1/cards/*', (req, res) => {  // good!
   const id = req.params[0];
   return dbHelpers.deleteCardById(id, res);
 });

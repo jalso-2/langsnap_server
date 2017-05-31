@@ -3,7 +3,6 @@ const User = require('./user/user_schema');
 const Card = require('./card/card_schema');
 const Deck = require('./deck/deck_schema');
 const DeckCard = require('./deck_card/deck_card_schema');
-const UserCard = require('./user_card/user_card_schema');
 
 module.exports = {
   getAllCardsFromDeckByDeckId: async (id, res) => {
@@ -167,7 +166,7 @@ module.exports = {
         try {
           const deck = await Deck.findOne({ where: { id: deck_id } });
           try {
-            await card.addDeck(deck, {  // changed, do it work?
+            await card.addDeck(deck, {
               timeInterval: 3000,
               phrase: '',
               lastVisited: (new Date()).toISOString(),
@@ -214,24 +213,59 @@ module.exports = {
       return res.sendStatus(400);
     }
   },
+  addMultipleDecksAndUserSpecificsToJoinTable: async (user_id, decks, res) => {
+    try {
+      await Promise.all(decks.map(async (deckId) => {
+        const origDeck = await Deck.findOne({ where: { id: deckId } });
+        const name = origDeck.name;
+        const createdDeck = await Deck.create({ user_id, name, stars: 0 });
+        const joinTableCardIdsArr = await DeckCard.findAll({
+          where: { deck_id: deckId },
+        });
+        await Promise.all(joinTableCardIdsArr.map(async (joinObj) => {
+          const card = await Card.findOne({ where: { id: joinObj.card_id } });
+          // const user = await User.findOne({ where: { id: user_id } });
+          await card.addUser(user_id);
+          await createdDeck.addCard(card, {
+            timeInterval: 3000,
+            phrase: joinObj.phrase,
+            lastVisited: (new Date()).toISOString(),
+            card_id: joinObj.card_id,
+            deck_id: joinObj.deck_id,
+          });
+        }));
+      }));
+      return res.status(200).send('Successfully added decks!');
+    } catch (err) {
+      return res.status(400).send(err);
+    }
+  },
   createCardsForDeckByCardIds: async (deck_id, cardIdsArr, res) => {
-    await Promise.all(cardIdsArr.map(async (card_id) => {
-      try {
+    try {
+      await Promise.all(cardIdsArr.map(async (card_id) => {
         const deck = await Deck.findOne({ where: { id: deck_id } });
-        try {
-          await deck.addDeck(deck_id);
-          try {
-            await deck.addCard(card_id);
-            return 'OK';
-          } catch (error) {
-            return res.status(400).send(error);
-          }
-        } catch (erro) {
-          return res.status(400).send(erro);
-        }
-      } catch (err) {
-        return res.status(400).send(err);
-      }
-    }));
+        const card = await Card.findOne({ where: { id: card_id } });
+        const newCard = await Card.create({
+          stars: 0,
+          wordMap: card.wordMap,
+          imgUrl: card.imgUrl,
+        });
+        const joinTableEntry = await DeckCard.findOne({
+          where: {
+            card_id,
+            deck_id,
+          },
+        });
+        await deck.addCard(card, {
+          timeInterval: 3000,
+          phrase: joinTableEntry.phrase,
+          lastVisited: (new Date()).toISOString(),
+          card_id: newCard.card_id,
+        });
+      }));
+      return res.sendStatus(200);
+    } catch (err) {
+      return res.status(400).send(err);
+    }
   },
 };
