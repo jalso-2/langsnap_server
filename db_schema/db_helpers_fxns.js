@@ -215,7 +215,7 @@ module.exports = {
       return res.status(400).send(err);
     }
   },
-  userAddCreatedCardToDeck: async (user_id, imgUrl, wordMap, deck_id, res) => {
+  userAddCreatedCardToDeck: async (user_id, imgUrl, wordMap, deck_id, res) => {  // need to fix
     try {
       const card = await Card.create({ stars: 0, wordMap, imgUrl });
       try {

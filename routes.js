@@ -2,6 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 const dbHelpers = require('./db_schema/db_helpers_fxns');
+const apiHelpers = require('./api_helpers/api_helpers');
 const Card = require('./db_schema/card/card_schema');
 const Deck = require('./db_schema/deck/deck_schema');
 const User = require('./db_schema/user/user_schema');
@@ -23,7 +24,7 @@ router.post('/v2/*', (req, res) => {
 router.post('/v1/cloudinaryurltogoogle', (req, res) => {
   const url = req.body.url;
   console.log(url);
-  dbHelpers.sendUrlToGoogleVisionForName(url, res);
+  apiHelpers.sendUrlToGoogleVisionForName(url, res);
 });
 
 // testing only delete when done
@@ -32,27 +33,27 @@ router.get('/v1/users/all', async (req, res) => {
   return res.status(200).send(user);
 });
 
-
 router.get('/v1/oxford/sentence/word/*', (req, res) => {
   const queryWord = req.params[0];
-  return dbHelpers.getSamplePhraseEnglishFromWordOxford(queryWord, res);
+  return apiHelpers.getSamplePhraseEnglishFromWordOxford(queryWord, res);
 });
 
 router.get('/v1/wordnik/sentence/word/*', (req, res) => {
   const queryWord = req.params[0];
-  return dbHelpers.getSamplePhraseFromWordWordnik(queryWord, res);
+  return apiHelpers.getSamplePhraseFromWordWordnik(queryWord, res);
 });
 
 router.post('/v1/googletranslate/sentence', (req, res) => {
   const q = req.body.q;
   const source = req.body.source;
   const target = req.body.target;
-  return dbHelpers.getGoogleTranslateOfSentence(q, source, target, res);
+  return apiHelpers.getGoogleTranslateOfSentence(q, source, target, res);
 });
 
 router.get('/v1/users/auth/*/*', (req, res) => {
   const socialLoginSource = req.params[0];
-  const username = req.params[1];
+  const username = decodeURI(req.params[1]);
+  console.log(username, 'this is jay username');
   if (socialLoginSource === 'facebook') {
     return dbHelpers.findUserIfExistsBySocialId(socialLoginSource, username, res);
   }
@@ -60,7 +61,7 @@ router.get('/v1/users/auth/*/*', (req, res) => {
 });
 
 router.post('/v1/users/findorcreate', async (req, res) => {
-  const facebookUsername = req.body.facebookUsername;
+  const facebookUsername = decodeURI(req.body.facebookUsername);
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
   const token = req.body.token;
