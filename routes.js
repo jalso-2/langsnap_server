@@ -22,6 +22,10 @@ router.post('/v2/*', (req, res) => {
   return res.sendStatus(200);
 });
 
+router.get('/v1/users/everything', (req, res) => {
+  return dbHelpers.userGetItAll(res);
+});
+
 router.post('/v1/cloudinaryurltogoogle', (req, res) => {
   const url = req.body.url;
   console.log(url);
