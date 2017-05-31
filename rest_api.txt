@@ -20,6 +20,219 @@ DELETE requests should be used to remove instances from the database: DELETE /v1
 
 /* *****************************     LangSnap REST API Endpoints    ******************************************* */
 
+GET /  This is a test route that returns 'hello' with a 200 if successful
+
+POST /v2/*  This is a test endpoint that console.logs the request body and then sends a 200 resposne
+
+Request Body Format: No Specific Format
+
+POST /v1/cloudinaryurltogoogle  This endpoint is used to send the cloudinary url to google for object recognition
+
+Request Body Format: 
+{
+  "url":"http://cloudinaryurlhere"
+}
+
+Response Body Format: 
+[
+  {
+    "mid":"something",
+    "description":"wood",
+    "score":0.823
+  },...
+]
+
+
+GET /v1/wordnik/sentence/word/*  This endpoint allows for getting sentences that use a particular word
+
+Request Body Format:
+Request parameters include the word to query
+
+Response Body Format: 
+{
+  "examples": [
+    {
+      "provider": {
+        "name": "wordnik",
+        "id": 711
+      },
+      "year": 1899,
+      "rating": 8939.131,
+      "url": "http://api.wordnik.com/v4/mid/d32e5e6e501b3f60a78301cff9b15d9d5f8dd801afa6bebe188982a42466bb5b",
+      "word": "cat",
+      "text": "In a subsequent passage, \"I am as melancholy as a gibb'd cat\" -- we are told that _cat_ is not the domestic animal of that name, but a contraction of _catin_, a woman of the town.",
+      "title": "Famous Reviews",
+      "documentId": 18094183,
+      "exampleId": 1185868246
+    },
+    {
+      "provider": {
+        "name": "wordnik",
+        "id": 711
+      },
+      "year": 1885,
+      "rating": 8911.833,
+      "url": "http://api.wordnik.com/v4/mid/49331abab2ce16557a91f11541f066413756bd50430c9b4b9bf024ab01d533c8",
+      "word": "cat",
+      "text": "For example, that familiar animal the cat is called in Guyenne _lou catou_ and even _lou cat_; but the word belongs to the Romance language, and is the same all through Languedoc and",
+      "title": "Wanderings by southern waters, eastern Aquitaine",
+      "documentId": 18094981,
+      "exampleId": 1188445966
+    }, ...
+  ]
+}
+
+POST /v1/googletranslate/sentence  This endpoint is used to send a word, language, and target language to get sentence translations
+
+Request Body Format: 
+{
+"q":"The cat and the dog danced around the park",
+"source":"en",
+"target":"fr"
+}
+
+Response Body Format:
+{
+  "data": {
+    "translations": [
+      {
+        "translatedText": "Le chat et le chien dansaient autour du parc"
+      }
+    ]
+  }
+}
+
+GET /v1/oxford/sentence/word/*  This endpoint is used to get sentences from oxford for a particular word
+
+Request Body Format: 
+Request word should be put in request URL
+
+Response Body Format:
+{
+  "metadata": {
+    "provider": "Oxford University Press"
+  },
+  "results": [
+    {
+      "id": "napkin",
+      "language": "en",
+      "lexicalEntries": [
+        {
+          "language": "en",
+          "lexicalCategory": "Noun",
+          "sentences": [
+            {
+              "regions": [
+                "New Zealand"
+              ],
+              "senseIds": [
+                "m_en_gbus0677930.006",
+                "b-en-es0031950.003"
+              ],
+              "text": "It belongs in the position of a table napkin, beside a plate."
+            },
+            {
+              "regions": [
+                "North American"
+              ],
+              "senseIds": [
+                "m_en_gbus0677930.006",
+                "b-en-es0031950.003"
+              ],
+              "text": "Frankie grabbed a napkin from the silver holder and pulled a pen out of his pocket."
+            },...
+          ],
+          "text": "napkin"
+        }
+      ],
+      "type": "headword",
+      "word": "napkin"
+    }
+  ]
+}
+
+GET /v1/users/all  This endpoint is for testing only and is used to determine which users are in the database
+
+Request Body Format: 
+Request URL only
+
+Response Body Format:
+[
+  {
+    "id": 2,
+    "facebookUsername": "JDGoedert",
+    "firstName": "James",
+    "lastName": "Goedert",
+    "email": "james@gmail.com",
+    "token": "2112asd3456",
+    "nativeLang": "English",
+    "learnLang": "French",
+    "created_at": "2017-05-31T00:01:17.142Z",
+    "updated_at": "2017-05-31T00:01:17.142Z"
+  },
+  {
+    "id": 3,
+    "facebookUsername": "zbbergma",
+    "firstName": "Zachary",
+    "lastName": "Bergmann",
+    "email": "zachary@gmail.com",
+    "token": "21345jjjj6",
+    "nativeLang": "English",
+    "learnLang": "German",
+    "created_at": "2017-05-31T00:01:17.142Z",
+    "updated_at": "2017-05-31T00:01:17.142Z"
+  },...
+]
+
+GET /v1/users/auth/*/*  This endpoint is used to specify auth type and auth username to check if a user exists
+
+Request Body Format:
+No request body, should have auth type and auth username in URL request.
+Auth Supported: facebook
+
+Response Body Format: 
+{}
+or
+{
+  "id": 2,
+  "facebookUsername": "JDGoedert",
+  "firstName": "James",
+  "lastName": "Goedert",
+  "email": "james@gmail.com",
+  "token": "2112asd3456",
+  "nativeLang": "English",
+  "learnLang": "French",
+  "created_at": "2017-05-31T00:01:17.142Z",
+  "updated_at": "2017-05-31T00:01:17.142Z"
+}
+
+POST /v1/users/findorcreate  This endpoint either retrieves a user if they exist, creates the user if they do not exist, or
+updates the user if they do exist
+
+Request Body Format: 
+{
+  "facebookUsername": "JDGoedert",
+  "firstName": "James",
+  "lastName": "Goedert",
+  "email": "james@gmail.com",
+  "token": "2112asd3456",
+  "nativeLang": "English",
+  "learnLang": "French"
+}
+
+Response Body Format: 
+{
+  "id": 2,
+  "facebookUsername": "JDGoedert",
+  "firstName": "James",
+  "lastName": "Goedert",
+  "email": "james@gmail.com",
+  "token": "2112asd3456",
+  "nativeLang": "English",
+  "learnLang": "French",
+  "created_at": "2017-05-31T00:01:17.142Z",
+  "updated_at": "2017-05-31T00:01:17.142Z"
+}
 
 GET /v1/decks/deckid/1234 Used to get a single deck and all cards with information to be ready for use on front-endpoint
 
@@ -167,46 +380,7 @@ Response Body Format:
     ]
   }
 ]
-This operation is used to query only the cards in a specific user's deck
-
-
-POST /v1/users    Used to create a new user in the database, should be done after authenticating
-
-Request Body Format: 
-{
-  "firstName":"XXXX",     //String
-  "lastName:"XXXX",       //String
-  "email":"XXXX",         //String
-  "token":"XXXX"          //String
-}
-
-Response Body Format:
-id     //String
-
-This operation is used to create a new user and add them to the database. 
-
-
-POST /v1/users/addlang  Fill in <id> with appropriate id of user received back after login. Used to update the
-user profile on database.
-
-Request Body Format: 
-{
-  "id":XXXXX,             //Number
-  "nativeLang":"XXXX",    //String
-  "learnLang":"XXXX"      //String
-}
-
-Response Body Format: 
-{
-  "firstName":"XXXX",
-  "lastName":"XXXX",
-  "email":"XXXX",
-  "token":"XXXX",
-  "nativeLang":"XXXX",
-  "learnLang":"XXXX"
-}
-This operation is used to add the learnLang and nativeLang properties to the user since this cannot be done on
-the authentication screen.
+This operation is used to query only the cards in a specific user's deck 
 
 
 POST /v1/decks/new  Used to create a new deck for the user in database.
@@ -219,7 +393,16 @@ Request Body Format:
 }
 
 Response Body Format: 
-id    //id of the created deck, String
+
+{
+  "id": 37,
+  "name": "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJDeck",
+  "user_id": 2,
+  "stars": 1,
+  "updated_at": "2017-05-31T01:49:07.864Z",
+  "created_at": "2017-05-31T01:49:07.864Z"
+}
+
 This operation is used to by the user to create a new deck and add it to the database. The user can then add cards
 as desired.
 
@@ -234,24 +417,8 @@ Request Body Format:
 }
 
 Response Body Format: 
-[
-  {
-    "id": 15,
-    "user_id": 4,
-    "name": "JDeck",
-    "stars": 0,
-    "updated_at": "2017-05-26T02:02:53.069Z",
-    "created_at": "2017-05-26T02:02:53.069Z"
-  },
-  {
-    "id": 16,
-    "user_id": 4,
-    "name": "JJDeck",
-    "stars": 0,
-    "updated_at": "2017-05-26T02:02:53.069Z",
-    "created_at": "2017-05-26T02:02:53.069Z"
-  }
-]
+Successfully added decks!
+
 This operation creates many new decks for the desired user. It also finds all cards with the deckId and creates 
 a new copy of each that then references the deckId of the new users new deck that was created.
 

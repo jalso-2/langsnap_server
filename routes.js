@@ -119,7 +119,7 @@ router.post('/v1/decks/adddecks', (req, res) => {  // I think this one works!
   return dbHelpers.addMultipleDecksAndUserSpecificsToJoinTable(user_id, decks, res);
 });
 
-router.post('/v1/decks/addcards', (req, res) => {
+router.post('/v1/decks/addcards', (req, res) => {  // need to test a bit more!
   const deckId = req.body.deckId;
   const cardIdsArr = JSON.parse(req.body.cardIds);
   return dbHelpers.createCardsForDeckByCardIds(deckId, cardIdsArr, res);
