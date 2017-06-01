@@ -22,14 +22,15 @@ router.post('/v2/*', (req, res) => {
   return res.sendStatus(200);
 });
 
-router.get('/v1/users/everything', (req, res) => {
-  return dbHelpers.userGetItAll(res);
-});
+router.get('/v1/users/everything', (req, res) => dbHelpers.userGetItAll(res));
 
 router.post('/v1/cloudinaryurltogoogle', (req, res) => {
+  if (!req.body || !req.body.url) {
+    return res.status(400).send('Invalid url in body of request');
+  }
   const url = req.body.url;
   console.log(url);
-  apiHelpers.sendUrlToGoogleVisionForName(url, res);
+  return apiHelpers.sendUrlToGoogleVisionForName(url, res);
 });
 
 router.get('/v1/oxford/sentence/word/*', (req, res) => {
@@ -43,6 +44,9 @@ router.get('/v1/wordnik/sentence/word/*', (req, res) => {
 });
 
 router.post('/v1/googletranslate/sentence', (req, res) => {
+  if (!req.body || !req.body.q || !req.body.source || !req.body.target) {
+    return res.status(400).send('Error in body of request');
+  }
   const q = req.body.q;
   const source = req.body.source;
   const target = req.body.target;
@@ -103,6 +107,9 @@ router.get('/v1/cards/deckid/*', (req, res) => {  // need to test with proper da
 });
 
 router.post('/v1/decks/new', (req, res) => {  // good!
+  if (!req.body || !req.body.name || !req.body.user_id || !req.body.stars) {
+    return res.status(400).send('Error in body of request');
+  }
   const name = req.body.name;
   const user_id = req.body.user_id;
   const stars = req.body.stars;
@@ -110,6 +117,9 @@ router.post('/v1/decks/new', (req, res) => {  // good!
 });
 
 router.post('/v1/cards/addcard', (req, res) => { // working! leave it def for now!!!
+  if (!req.body || !req.body.user_id || !req.body.imgUrl || !req.body.wordMap || !req.body.deck_id) {
+    return res.status(400).send('Error in body of request');
+  }
   const user_id = req.body.user_id;
   const imgUrl = req.body.imgUrl;
   const wordMap = req.body.wordMap;
@@ -118,12 +128,18 @@ router.post('/v1/cards/addcard', (req, res) => { // working! leave it def for no
 });
 
 router.post('/v1/decks/adddecks', (req, res) => {  // I think this one works!
+  if (!req.body || !req.body.user_id || !req.body.decks) {
+    return res.status(400).send('Error in body of request');
+  }
   const user_id = req.body.id;
   const decks = JSON.parse(req.body.decks);
   return dbHelpers.addMultipleDecksAndUserSpecificsToJoinTable(user_id, decks, res);
 });
 
 router.post('/v1/decks/addcards', (req, res) => {  // need to test a bit more!
+  if (!req.body || !req.body.deckId || !req.body.cardIds) {
+    return res.status(400).send('Error in body of request');
+  }
   const deckId = req.body.deckId;
   const cardIdsArr = JSON.parse(req.body.cardIds);
   return dbHelpers.createCardsForDeckByCardIds(deckId, cardIdsArr, res);

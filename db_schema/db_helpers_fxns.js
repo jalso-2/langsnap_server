@@ -176,28 +176,16 @@ module.exports = {
   userAddCreatedCardToDeck: async (user_id, imgUrl, wordMap, deck_id, res) => {  // need to fix
     try {
       const card = await Card.create({ stars: 0, wordMap, imgUrl });
-      try {
-        await card.addUser(user_id);
-        try {
-          const deck = await Deck.findOne({ where: { id: deck_id } });
-          try {
-            await card.addDeck(deck, {
-              timeInterval: 3000,
-              phrase: '',
-              lastVisited: (new Date()).toISOString(),
-              card_id: card.id,
-              deck_id: deck.id,
-            });
-            return res.status(200).send(card);
-          } catch (er) {
-            return res.status(400).send(er);
-          }
-        } catch (error) {
-          return res.status(500).send(error);
-        }
-      } catch (erro) {
-        return res.status(500).send(erro);
-      }
+      await card.addUser(user_id);
+      const deck = await Deck.findOne({ where: { id: deck_id } });
+      await card.addDeck(deck, {
+        timeInterval: 3000,
+        phrase: '',
+        lastVisited: (new Date()).toISOString(),
+        card_id: card.id,
+        deck_id: deck.id,
+      });
+      return res.status(200).send(card);
     } catch (err) {
       return res.status(400).send(err);
     }
