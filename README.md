@@ -33,6 +33,3 @@ LangSnap uses a number of open source projects to work properly:
 * [Protractor] - End-to-end testing for db, server, and client integration
 
 
-
-
-### Installation
