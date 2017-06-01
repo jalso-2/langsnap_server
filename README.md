@@ -75,4 +75,4 @@ To install the application and get contribution ready:
   - npm i -g @angular/cli
   - //install IONIC
   - create config.ts file with???
-  
+
