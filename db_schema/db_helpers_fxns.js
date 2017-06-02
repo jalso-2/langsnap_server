@@ -157,6 +157,27 @@ module.exports = {
       return res.status(400).send(err);
     }
   },
+  userAnswerToCardWhilePaging: async (deck_id, card_id, answer, res) => {
+    const userMultFactor = {
+      good: 2,
+      ok: 1,
+      bad: 0.5,
+    };
+    const timeIntervalMultiplier = userMultFactor[answer];
+    console.log(timeIntervalMultiplier, 'time int multip');
+    try {
+      const currentDeckCard = await DeckCard.findOne({ where: { deck_id, card_id } });
+      console.log(typeof currentDeckCard.timeInterval);
+      const newDate = (new Date()).toISOString();
+      await DeckCard.update({
+        timeInterval: currentDeckCard.timeInterval * timeIntervalMultiplier,
+        lastVisited: newDate,
+      }, { where: { deck_id, card_id } });
+      return res.status(200).send('Success');
+    } catch (err) {
+      return res.status(400).send(err);
+    }
+  },
   addStarToDeckByDeckId: async (deck_id, res) => {
     try {
       const deck = await Deck.findOne({ where: { id: deck_id } });

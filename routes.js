@@ -136,6 +136,17 @@ router.post('/v1/cards/addcard', (req, res) => { // working! leave it def for no
   return dbHelpers.userAddCreatedCardToDeck(user_id, imgUrl, wordMap, deck_id, res);
 });
 
+router.post('/v1/cards/paginganswer', (req, res) => {
+  if (!req.body || !req.body.card_id || !req.body.deck_id || !req.body.answer) {
+    return res.status(400).send('Error in body of request');
+  }
+  const deck_id = req.body.deck_id;
+  const card_id = req.body.card_id;
+  const answer = req.body.answer;
+  console.log(answer);
+  return dbHelpers.userAnswerToCardWhilePaging(deck_id, card_id, answer, res);
+});
+
 router.post('/v1/decks/adddecks', (req, res) => {  // I think this one works!
   if (!req.body || !req.body.user_id || !req.body.decks) {
     return res.status(400).send('Error in body of request');
