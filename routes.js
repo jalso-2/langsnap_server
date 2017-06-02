@@ -169,24 +169,31 @@ router.post('/v1/decks/addcards', (req, res) => {  // need to test a bit more!
     return res.status(400).send('Error in body of request');
   }
   const deck_id = req.body.deck_id;
-  const cardIdsArr = JSON.parse(req.body.cardIds);
+  const cardIdsArr = req.body.cardIds;
   console.log('hello!', cardIdsArr, deck_id);
   return dbHelpers.createCardsForDeckByCardIds(deck_id, cardIdsArr, res);
 });
 
-router.delete('/v1/decks/*', (req, res) => {  // good!
-  const id = +req.params[0];
-  return dbHelpers.deleteDeckById(id, res);
+router.delete('/v1/decks/userid/*/deckid/*/cardid/*', (req, res) => {
+  const user_id = req.params[0];
+  const deck_id = req.params[1];
+  const card_id = req.params[2];
+  return dbHelpers.userRemoveCardFromOwnDeckByDeckId(user_id, deck_id, card_id, res);
 });
 
-router.delete('/v1/decks/mult/*', (req, res) => {  // good!
+router.delete('/v1/decks/mult/*', (req, res) => {  // needs to delete from user_cards also...
   const ids = req.params[0].split('/');
   return dbHelpers.deleteMultipleDecksByIds(ids, res);
 });
 
-router.delete('/v1/cards/*', (req, res) => {  // good!
+router.delete('/v1/cards/*', (req, res) => {  // good, deletes from deck_cards join correctly
   const id = req.params[0];
   return dbHelpers.deleteCardById(id, res);
+});
+
+router.delete('/v1/decks/*', (req, res) => {
+  const id = +req.params[0];
+  return dbHelpers.deleteDeckById(id, res);
 });
 
 module.exports = router;

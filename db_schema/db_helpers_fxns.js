@@ -3,6 +3,7 @@ const User = require('./user/user_schema');
 const Card = require('./card/card_schema');
 const Deck = require('./deck/deck_schema');
 const DeckCard = require('./deck_card/deck_card_schema');
+const UserCard = require('./user_card/user_card_schema');
 
 module.exports = {
   userGetItAll: async (res) => {
@@ -294,6 +295,7 @@ module.exports = {
           card_id: newCard.card_id,
         });
         console.log('returning ok now!');
+        await newCard.addUser(deck.user_id);
         return 'OK';
       }));
       return res.sendStatus(200);
@@ -301,14 +303,40 @@ module.exports = {
       return res.status(400).send(err);
     }
   },
+  // deleteMultipleDecksByIds: async (ids, res) => {
+  //   try {
+  //     await Promise.all(ids.map(async (deck_id) => {
+  //       await Deck.destroy({ where: { id: +deck_id } });
+  //       return 'OK';
+  //     }));
+  //     return res.status(200).send('Successfully deleted!');
+  //   } catch (err) {
+  //     return res.status(400).send(err);
+  //   }
+  // },
   deleteMultipleDecksByIds: async (ids, res) => {
-    console.log('got here!!!');
     try {
+      const deck = await Deck.findOne({ where: { id: +ids[0] } });
+      const user_id = deck.user_id;
+      let cardsToRemoveFromUser = [];
       await Promise.all(ids.map(async (deck_id) => {
-        await Deck.destroy({ where: { id: +deck_id } });
-        return 'OK';
+        const joinEntries = await DeckCard.findAll({ where: { deck_id: +deck_id } });
+        cardsToRemoveFromUser = cardsToRemoveFromUser.concat(joinEntries.map(entry => entry.card_id));
+        await DeckCard.destroy({ where: { deck_id: +deck_id } });
       }));
-      return res.status(200).send('Successfully deleted!');
+      await Promise.all(cardsToRemoveFromUser.map(async (card_id) => {
+        await UserCard.destroy({ where: { user_id, card_id } });
+      }));
+      return res.status(200).send('Success');
+    } catch (err) {
+      return res.status(400).send(err);
+    }
+  },
+  userRemoveCardFromOwnDeckByDeckId: async (user_id, deck_id, card_id, res) => {
+    try {
+      await DeckCard.destroy({ where: { deck_id, card_id } });
+      await UserCard.destroy({ where: { user_id, card_id } });
+      return res.status(200).send('Success');
     } catch (err) {
       return res.status(400).send(err);
     }
