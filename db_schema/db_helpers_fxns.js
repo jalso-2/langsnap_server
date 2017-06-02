@@ -164,14 +164,11 @@ module.exports = {
       bad: 0.5,
     };
     const timeIntervalMultiplier = userMultFactor[answer];
-    console.log(timeIntervalMultiplier, 'time int multip');
     try {
       const currentDeckCard = await DeckCard.findOne({ where: { deck_id, card_id } });
-      console.log(typeof currentDeckCard.timeInterval);
-      const newDate = (new Date()).toISOString();
       await DeckCard.update({
         timeInterval: currentDeckCard.timeInterval * timeIntervalMultiplier,
-        lastVisited: newDate,
+        lastVisited: (new Date()).toISOString(),
       }, { where: { deck_id, card_id } });
       return res.status(200).send('Success');
     } catch (err) {

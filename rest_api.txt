@@ -352,6 +352,16 @@ Response Body Format:
 	"user_id": 3
 }
 
+POST /v1/cards/paginganswer  This endpoint is used to update the timeInterval depending on the user's response
+
+Request Body Format: 
+{
+	"deck_id":1,
+	"card_id":1,
+	"answer":"good"   //options are: good, ok, bad
+}
+
+Response Body Format: 'Success'
 
 GET /v1/cards/all     Used to get every card that is available in the database
 

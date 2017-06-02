@@ -143,7 +143,6 @@ router.post('/v1/cards/paginganswer', (req, res) => {
   const deck_id = req.body.deck_id;
   const card_id = req.body.card_id;
   const answer = req.body.answer;
-  console.log(answer);
   return dbHelpers.userAnswerToCardWhilePaging(deck_id, card_id, answer, res);
 });
 
