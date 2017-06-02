@@ -18,6 +18,8 @@ require('./db_schema/db_relationships');
 
 // ///////////////////////// START MIDDLEWARE ///////////////////////////////
 server.use(helmet());
+server.use(helmet.hidePoweredBy());
+server.disable('x-powered-by');
 server.use(cors());
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: false }));
