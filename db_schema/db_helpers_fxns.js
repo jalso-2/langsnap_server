@@ -157,6 +157,17 @@ module.exports = {
       return res.status(400).send(err);
     }
   },
+  addStarToDeckByDeckId: async (deck_id, res) => {
+    try {
+      const deck = await Deck.findOne({ where: { id: deck_id } });
+      console.log('sent invalid deck', deck);
+      Deck.update({ stars: deck.stars + 1 }, { where: { id: deck_id } });
+      deck.stars = deck.stars + 1;
+      return res.status(200).send(deck);
+    } catch (err) {
+      return res.status(400).send(err);
+    }
+  },
   getAllCards: async (res) => {
     try {
       const cards = await Card.findAll({ attributes: ['id', 'imgUrl', 'stars'] });
@@ -244,8 +255,8 @@ module.exports = {
   },
   createCardsForDeckByCardIds: async (deck_id, cardIdsArr, res) => {
     try {
+      const deck = await Deck.findOne({ where: { id: deck_id } });
       await Promise.all(cardIdsArr.map(async (card_id) => {
-        const deck = await Deck.findOne({ where: { id: deck_id } });
         const card = await Card.findOne({ where: { id: card_id } });
         const newCard = await Card.create({
           stars: 0,
@@ -255,17 +266,31 @@ module.exports = {
         const joinTableEntry = await DeckCard.findOne({
           where: {
             card_id,
-            deck_id,
           },
         });
+        console.log(joinTableEntry, 'did the join table query, keep looking!');
         await deck.addCard(card, {
           timeInterval: 3000,
           phrase: joinTableEntry.phrase,
           lastVisited: (new Date()).toISOString(),
           card_id: newCard.card_id,
         });
+        console.log('returning ok now!');
+        return 'OK';
       }));
       return res.sendStatus(200);
+    } catch (err) {
+      return res.status(400).send(err);
+    }
+  },
+  deleteMultipleDecksByIds: async (ids, res) => {
+    console.log('got here!!!');
+    try {
+      await Promise.all(ids.map(async (deck_id) => {
+        await Deck.destroy({ where: { id: +deck_id } });
+        return 'OK';
+      }));
+      return res.status(200).send('Successfully deleted!');
     } catch (err) {
       return res.status(400).send(err);
     }

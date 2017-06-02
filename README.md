@@ -51,19 +51,20 @@ LangSnap is structured to be in three separate parts:
 
 The API server and database are collectively in the langsnap_server repository (https://github.com/jalso-2/langsnap_server) 
 
-The LangSnap application is served on its own server with the dist files. The frontend server is at https://github.com/jalso-2/langsnap_fe_server
+The LangSnap application is served on its own server with the dist files.
+The frontend server is at https://github.com/jalso-2/langsnap_fe_server
 The frontend application is at https://github.com/jalso-2/LangSnap
 
 To install the API server:
-  -Node version 7.6.0 - 7.10.0 should be used
-  -Create a .env file
-  -.env file should have:
+  - Node version 7.6.0 - 7.10.0 should be used
+  - Create a .env file
+  - .env file should have:
     - PORT
     - DATABASE_URL
     - GOOGLE_VISION
-    -WORDNIK_KEY
-    -OXFORD_APP_KEY
-    -OXFORD_APP_ID
+    - WORDNIK_KEY
+    - OXFORD_APP_KEY
+    - OXFORD_APP_ID
 
 Once configured run the following sequence of commands to get started and contribute!:
 ```sh
