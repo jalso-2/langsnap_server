@@ -82,6 +82,24 @@ Response Body Format:
   ]
 }
 
+POST /v1/googletranslate/wordmap  This endpoint returns a wordmap with all supported translations for a word
+
+Request Body Format:
+{
+  "q":"dog",
+  "source":"en"
+}
+
+Response Body Format: 
+{
+	"en": "dog",
+	"es": "perro",
+	"fr": "chien",
+	"de": "Hund",
+	"ja": "犬",
+	"ru": "собака"
+}
+
 POST /v1/googletranslate/sentence  This endpoint is used to send a word, language, and target language to get sentence translations
 
 Request Body Format: 
@@ -317,6 +335,23 @@ Response Body Format:
 ]
 This operation gets all of the decks and card info for those decks for a particular userId
 
+POST /v1/decks/addstar  This endpoint is used to add a star to a particular deck
+
+Request Body Format: 
+{
+	"deck_id":1
+}
+
+Response Body Format: 
+{
+	"id": 1,
+	"name": "ZachDeck",
+	"stars": 47,
+	"created_at": "2017-06-01T17:12:08.595Z",
+	"updated_at": "2017-06-02T19:48:21.082Z",
+	"user_id": 3
+}
+
 
 GET /v1/cards/all     Used to get every card that is available in the database
 
@@ -412,7 +447,7 @@ POST /v1/decks/adddecks  Used to copy multiple decks from another user to add th
 
 Request Body Format: 
 {
-	"id":4,
+	"user_id":4,
 	"decks":"[3,4]"
 }
 

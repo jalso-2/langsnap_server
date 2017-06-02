@@ -33,8 +33,14 @@ LangSnap uses a number of open source projects to work properly:
 * [Karma] - Unit testing framework for testing single pieces of code
 * [Protractor] - End-to-end testing for db, server, and client integration
 
+### Schema
 
+![LangSnap DB Schema](./langsnap_schema.png?raw=true "Schema")
 
+Explanation of database schema: 
+  - Users have user specific decks
+  - Decks have many cards and cards have many decks
+  - User specific information for a card in a user's deck is stored in the deck_card join table (this is the Anki style data)
 
 ### Installation
 
@@ -45,34 +51,42 @@ LangSnap is structured to be in three separate parts:
 
 The API server and database are collectively in the langsnap_server repository (https://github.com/jalso-2/langsnap_server) 
 
-The LangSnap application is served on its own server with the dist files. The frontend server is at https://github.com/jalso-2/langsnap_fe_server
+The LangSnap application is served on its own server with the dist files.
+The frontend server is at https://github.com/jalso-2/langsnap_fe_server
 The frontend application is at https://github.com/jalso-2/LangSnap
 
 To install the API server:
-  -Node version 7.6.0 - 7.10.0 should be used
-  -Create a .env file
-  -.env file should have:
+  - Node version 7.6.0 - 7.10.0 should be used
+  - Create a .env file
+  - .env file should have:
     - PORT
     - DATABASE_URL
     - GOOGLE_VISION
-    -WORDNIK_KEY
-    -OXFORD_APP_KEY
-    -OXFORD_APP_ID
+    - WORDNIK_KEY
+    - OXFORD_APP_KEY
+    - OXFORD_APP_ID
 
 Once configured run the following sequence of commands to get started and contribute!:
-  - npm i
-  - npm start / npm run dev  (only run npm run dev if Nodemon is installed)
+```sh
+npm i
+npm run dev
+```
+
+(Note: You need to have Nodemon installed to run in development mode. If you do not have Nodemon, install it or use 'npm start' instead)
 
 
 
 To install the FrontEnd server:
-  - npm i
-  - npm start
+
+```sh
+npm i
+npm start
+```
 
 
 
 To install the application and get contribution ready:
-  - npm i -g @angular/cli
+  - npm i -g ionic cordova
   - //install IONIC
   - create config.ts file with???
 

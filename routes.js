@@ -53,6 +53,15 @@ router.post('/v1/googletranslate/sentence', (req, res) => {
   return apiHelpers.getGoogleTranslateOfSentence(q, source, target, res);
 });
 
+router.post('/v1/googletranslate/wordmap', (req, res) => {
+  if (!req.body || !req.body.q || !req.body.source) {
+    return res.status(400).send('Error in body of request');
+  }
+  const q = req.body.q;
+  const source = req.body.source;
+  return apiHelpers.getGoogleTranslateOfWord(q, source, res);
+});
+
 // testing only delete when done
 router.get('/v1/users/all', async (req, res) => {
   const user = await User.findAll({});
@@ -136,18 +145,33 @@ router.post('/v1/decks/adddecks', (req, res) => {  // I think this one works!
   return dbHelpers.addMultipleDecksAndUserSpecificsToJoinTable(user_id, decks, res);
 });
 
-router.post('/v1/decks/addcards', (req, res) => {  // need to test a bit more!
-  if (!req.body || !req.body.deckId || !req.body.cardIds) {
+router.post('/v1/decks/addstar', (req, res) => {
+  if (!req.body || !req.body.deck_id) {
     return res.status(400).send('Error in body of request');
   }
-  const deckId = req.body.deckId;
+  const deck_id = req.body.deck_id;
+  return dbHelpers.addStarToDeckByDeckId(deck_id, res);
+});
+
+router.post('/v1/decks/addcards', (req, res) => {  // need to test a bit more!
+  console.log(req);
+  if (!req.body || !req.body.deck_id || !req.body.cardIds) {
+    return res.status(400).send('Error in body of request');
+  }
+  const deck_id = req.body.deck_id;
   const cardIdsArr = JSON.parse(req.body.cardIds);
-  return dbHelpers.createCardsForDeckByCardIds(deckId, cardIdsArr, res);
+  console.log('hello!', cardIdsArr, deck_id);
+  return dbHelpers.createCardsForDeckByCardIds(deck_id, cardIdsArr, res);
 });
 
 router.delete('/v1/decks/*', (req, res) => {  // good!
   const id = +req.params[0];
   return dbHelpers.deleteDeckById(id, res);
+});
+
+router.delete('/v1/decks/mult/*', (req, res) => {  // good!
+  const ids = req.params[0].split('/');
+  return dbHelpers.deleteMultipleDecksByIds(ids, res);
 });
 
 router.delete('/v1/cards/*', (req, res) => {  // good!
