@@ -27,10 +27,15 @@ module.exports = {
         include: [{
           model: Card,
           attributes: ['id', 'imgUrl', 'wordMap', 'stars'],
-          through: { attributes: ['lastVisited', 'timeInterval', 'phrase'] },
+          through: { model: DeckCard, attributes: ['lastVisited', 'timeInterval', 'phrase'] },
         }],
         where: { id },
         attributes: ['id', 'name'],
+      });
+      deck[0].cards.sort((first, second) => {
+        const firstCopy = new Date(first.deck_card.lastVisited.getTime() + first.deck_card.timeInterval);
+        const secondCopy = new Date(second.deck_card.lastVisited.getTime() + second.deck_card.timeInterval);
+        return firstCopy > secondCopy;
       });
       return res.status(200).send(deck);
     } catch (err) {
@@ -209,7 +214,7 @@ module.exports = {
       await card.addUser(user_id);
       const deck = await Deck.findOne({ where: { id: deck_id } });
       await card.addDeck(deck, {
-        timeInterval: 3000,
+        timeInterval: 900000,
         phrase: '',
         lastVisited: (new Date()).toISOString(),
         card_id: card.id,
@@ -259,7 +264,7 @@ module.exports = {
           const card = await Card.findOne({ where: { id: joinObj.card_id } });
           await card.addUser(user_id);
           await createdDeck.addCard(card, {
-            timeInterval: 3000,
+            timeInterval: 900000,
             phrase: joinObj.phrase,
             lastVisited: (new Date()).toISOString(),
             card_id: joinObj.card_id,
@@ -289,7 +294,7 @@ module.exports = {
         });
         console.log(joinTableEntry, 'did the join table query, keep looking!');
         await deck.addCard(card, {
-          timeInterval: 3000,
+          timeInterval: 900000,
           phrase: joinTableEntry.phrase,
           lastVisited: (new Date()).toISOString(),
           card_id: newCard.card_id,

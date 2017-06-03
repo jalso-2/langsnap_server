@@ -16,7 +16,7 @@ module.exports = {
       await card.addUser(user_id);
       const deck = await Deck.findOne({ where: { id: deck_id } });
       await card.addDeck(deck, {
-        timeInterval: 3000,
+        timeInterval: 900000,
         phrase: '',
         lastVisited: (new Date()).toISOString(),
         card_id: card.id,
