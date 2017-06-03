@@ -6,7 +6,7 @@ LangSnap is a language learning application that is empowered with modern techno
 
   - Anki-style: Time interval training to learn most effectively
   - Object recognition allows you take a picture to make new cards from real world objects!
-  - VR translation of text to another language
+  - AR translation of text to another language
 
 # Wireframes
 
@@ -16,7 +16,7 @@ LangSnap is a language learning application that is empowered with modern techno
 
 LangSnap uses a number of open source projects to work properly:
 
-![LangSnap Tech Stack](./langsnap_techstack.png?raw=true "Tech Stack")
+![LangSnap Tech Stack](./langsnap_tech_stack.jpg?raw=true "Tech Stack")
 
 * [Angular2] - HTML enhanced for web apps!
 * [Ionic 2] - Hybrid app environment/wrapper to make web apps mobile friendly
