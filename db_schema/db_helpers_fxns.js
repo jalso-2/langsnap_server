@@ -194,7 +194,18 @@ module.exports = {
   },
   getAllCards: async (res) => {
     try {
-      const cards = await Card.findAll({ attributes: ['id', 'imgUrl', 'stars'] });
+      const cards = await Card.findAll({
+        include: [{
+          model: Deck,
+          attributes: [],
+          through: {
+            model: DeckCard,
+            attributes: ['wordMap'],
+          },
+        }],
+        // attributes: ['id', 'imgUrl', 'stars'],
+        where: {},
+      });
       return res.status(200).send(cards);
     } catch (err) {
       return res.status(400).send(err);
@@ -294,7 +305,7 @@ module.exports = {
         });
         console.log(joinTableEntry, 'did the join table query, keep looking!');
         await deck.addCard(card, {
-          timeInterval: 900000,
+          timeInterval: 3000,
           phrase: joinTableEntry.phrase,
           lastVisited: (new Date()).toISOString(),
           card_id: newCard.card_id,
