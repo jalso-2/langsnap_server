@@ -6,22 +6,26 @@ const DeckCard = require('./deck_card/deck_card_schema');
 const UserCard = require('./user_card/user_card_schema');
 
 module.exports = {
-  userGetItAll: async (res) => {
+  userGetItAll: async () => {
     try {
       const everything = await Deck.findAll({
         where: {},
         include: [
           {
+            model: User,
+          },
+          {
             model: Card,
+            through: {},
           },
         ],
       });
-      return res.status(200).send(everything);
+      return everything;
     } catch (err) {
-      return res.status(400).send(err);
+      return err;
     }
   },
-  getAllCardsFromDeckByDeckId: async (id, res) => {
+  getAllCardsFromDeckByDeckId: async (id) => {
     try {
       const deck = await Deck.findAll({
         include: [{
@@ -37,20 +41,17 @@ module.exports = {
         const secondCopy = new Date(second.deck_card.lastVisited.getTime() + second.deck_card.timeInterval);
         return firstCopy > secondCopy;
       });
-      return res.status(200).send(deck);
+      return deck;
     } catch (err) {
-      return res.status(400).send(err);
+      return err;
     }
   },
-  findUserIfExistsBySocialId: async (socialLoginSource, username, res) => {
+  findUserIfExistsBySocialId: async (socialLoginSource, username) => {
     try {
       const user = await User.findOne({ where: { facebookUsername: username } });
-      if (user === null) {
-        return res.status(200).send({});
-      }
-      return res.status(200).send(user);
+      return user;
     } catch (err) {
-      return res.sendStatus(500);
+      return err;
     }
   },
   findAndUpdateOrCreateUser: async (
@@ -60,8 +61,7 @@ module.exports = {
     token,
     nativeLang,
     learnLang,
-    email,
-    res) => {
+    email) => {
     try {
       let user = await User.findOrCreate({
         where: { facebookUsername },
@@ -89,21 +89,21 @@ module.exports = {
           });
           try {
             user = await User.findOne({ where: { facebookUsername } });
-            return res.status(200).send(user);
+            return user;
           } catch (erro) {
-            return res.status(400).send(erro);
+            return erro;
           }
         } catch (error) {
-          return res.status(400).send(error);
+          return error;
         }
       } else {
-        return res.status(200).send(user[0]);
+        return user[0];
       }
     } catch (err) {
-      return res.status(400).send(err);
+      return err;
     }
   },
-  getAllDecks: async (res) => {
+  getAllDecks: async () => {
     try {
       const decks = await Deck.findAll({
         include: [
@@ -115,9 +115,9 @@ module.exports = {
         ],
         attributes: ['id', 'name', 'stars'],
       });
-      return res.status(200).send(decks);
+      return decks;
     } catch (err) {
-      return res.status(400).send(err);
+      return err;
     }
   },
   getDeckByDeckId: async (id, res) => {

@@ -30,19 +30,13 @@ describe('Langsnap API server', () => {
 
       // Perform sync of models with existing database models
       const syncDb = async () => {
-        await User.sync();
-        await Deck.sync();
-        await Card.sync();
-        await UserCard.sync();
-        await DeckCard.sync();
+        await User.sync({ force: true });
+        await Deck.sync({ force: true });
+        await Card.sync({ force: true });
+        await UserCard.sync({ force: true });
+        await DeckCard.sync({ force: true });
       };
       syncDb();
-
-      await User.destroy({ force: true });
-      await Deck.destroy({ force: true });
-      await Card.destroy({ force: true });
-      await UserCard.destroy({ force: true });
-      await DeckCard.destroy({ force: true });
     } catch (err) {
       console.log('database had an error!');
     }
@@ -119,9 +113,9 @@ describe('Langsnap API server', () => {
         done();
       });
   });
-  describe('should have a GET /v1/users/all route', () => {
-    it('should return an array of all users in the database', (done) => {
+  // describe('should have a GET /v1/users/all route', () => {
+  //   it('should return an array of all users in the database', (done) => {
 
-    });
-  });  
+  //   });
+  // });  
 });

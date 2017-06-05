@@ -22,7 +22,13 @@ router.post('/v2/*', (req, res) => {
   return res.sendStatus(200);
 });
 
-router.get('/v1/users/everything', (req, res) => dbHelpers.userGetItAll(res));
+router.get('/v1/users/everything', async (req, res) => {
+  const data = await dbHelpers.userGetItAll();
+  if (data instanceof Error) {
+    return res.status(400).send(data);
+  }
+  return res.status(200).send(data);
+});
 
 router.post('/v1/cloudinaryurltogoogle', (req, res) => {
   if (!req.body || !req.body.url) {
@@ -68,11 +74,12 @@ router.get('/v1/users/all', async (req, res) => {
   return res.status(200).send(user);
 });
 
-router.get('/v1/users/auth/*/*', (req, res) => {
+router.get('/v1/users/auth/*/*', async (req, res) => {
   const socialLoginSource = req.params[0];
   const username = decodeURI(req.params[1]);
   if (socialLoginSource === 'facebook') {
-    return dbHelpers.findUserIfExistsBySocialId(socialLoginSource, username, res);
+    const result = await dbHelpers.findUserIfExistsBySocialId(socialLoginSource, username);
+    return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
   }
   return res.sendStatus(400);
 });
@@ -85,7 +92,7 @@ router.post('/v1/users/findorcreate', async (req, res) => {
   const nativeLang = req.body.nativeLang;
   const learnLang = req.body.learnLang;
   const email = req.body.email;
-  return dbHelpers.findAndUpdateOrCreateUser(
+  const result = dbHelpers.findAndUpdateOrCreateUser(
     facebookUsername,
     firstName,
     lastName,
@@ -94,9 +101,13 @@ router.post('/v1/users/findorcreate', async (req, res) => {
     learnLang,
     email,
     res);
+  return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
 });
 
-router.get('/v1/decks/all', (req, res) => dbHelpers.getAllDecks(res)); // getting cards array, why? seeded data?
+router.get('/v1/decks/all', async (req, res) => {
+  const result = await dbHelpers.getAllDecks(); // getting cards array, why? seeded data?
+  return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
+});
 
 router.get('/v1/decks/deckid/*', (req, res) => {  // good!
   const id = +req.params[0];
@@ -110,9 +121,10 @@ router.get('/v1/decks/userid/*', (req, res) => {  // good!
 
 router.get('/v1/cards/all', (req, res) => dbHelpers.getAllCards(res));  // good
 
-router.get('/v1/cards/deckid/*', (req, res) => {  // need to test with proper data again
+router.get('/v1/cards/deckid/*', async (req, res) => {  // need to test with proper data again
   const id = +req.params[0];
-  return dbHelpers.getAllCardsFromDeckByDeckId(id, res);
+  const result = await dbHelpers.getAllCardsFromDeckByDeckId(id);
+  return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
 });
 
 router.post('/v1/decks/new', (req, res) => {  // good!
