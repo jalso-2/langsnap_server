@@ -109,17 +109,22 @@ router.get('/v1/decks/all', async (req, res) => {
   return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
 });
 
-router.get('/v1/decks/deckid/*', (req, res) => {  // good!
+router.get('/v1/decks/deckid/*', async (req, res) => {  // good!
   const id = +req.params[0];
-  return dbHelpers.getDeckByDeckId(id, res);
+  const result = await dbHelpers.getDeckByDeckId(id);
+  return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
 });
 
-router.get('/v1/decks/userid/*', (req, res) => {  // good!
+router.get('/v1/decks/userid/*', async (req, res) => {  // good!
   const id = +req.params[0];
-  return dbHelpers.getDeckByUserId(id, res);
+  const result = await dbHelpers.getDeckByUserId(id);
+  return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
 });
 
-router.get('/v1/cards/all', (req, res) => dbHelpers.getAllCards(res));  // good
+router.get('/v1/cards/all', async (req, res) => {
+  const result = await dbHelpers.getAllCards();  // good
+  return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
+});
 
 router.get('/v1/cards/deckid/*', async (req, res) => {  // need to test with proper data again
   const id = +req.params[0];
@@ -127,17 +132,18 @@ router.get('/v1/cards/deckid/*', async (req, res) => {  // need to test with pro
   return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
 });
 
-router.post('/v1/decks/new', (req, res) => {  // good!
+router.post('/v1/decks/new', async (req, res) => {  // good!
   if (!req.body || !req.body.name || !req.body.user_id || !req.body.stars) {
     return res.status(400).send('Error in body of request');
   }
   const name = req.body.name;
   const user_id = req.body.user_id;
   const stars = req.body.stars;
-  return dbHelpers.userCreateNewDeck(name, user_id, stars, res);
+  const result = await dbHelpers.userCreateNewDeck(name, user_id, stars);
+  return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
 });
 
-router.post('/v1/cards/addcard', (req, res) => { // working! leave it def for now!!!
+router.post('/v1/cards/addcard', async (req, res) => { // working! leave it def for now!!!
   if (!req.body || !req.body.user_id || !req.body.imgUrl || !req.body.wordMap || !req.body.deck_id) {
     return res.status(400).send('Error in body of request');
   }
@@ -145,67 +151,74 @@ router.post('/v1/cards/addcard', (req, res) => { // working! leave it def for no
   const imgUrl = req.body.imgUrl;
   const wordMap = req.body.wordMap;
   const deck_id = req.body.deck_id;
-  return dbHelpers.userAddCreatedCardToDeck(user_id, imgUrl, wordMap, deck_id, res);
+  const result = await dbHelpers.userAddCreatedCardToDeck(user_id, imgUrl, wordMap, deck_id);
+  return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
 });
 
-router.post('/v1/cards/paginganswer', (req, res) => {
+router.post('/v1/cards/answer', async (req, res) => {
   if (!req.body || !req.body.card_id || !req.body.deck_id || !req.body.answer) {
     return res.status(400).send('Error in body of request');
   }
   const deck_id = req.body.deck_id;
   const card_id = req.body.card_id;
   const answer = req.body.answer;
-  return dbHelpers.userAnswerToCardWhilePaging(deck_id, card_id, answer, res);
+  const result = await dbHelpers.userAnswerToCardWhilePaging(deck_id, card_id, answer);
+  return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
 });
 
-router.post('/v1/decks/adddecks', (req, res) => {  // I think this one works!
+router.post('/v1/decks/adddecks', async (req, res) => {  // I think this one works!
   if (!req.body || !req.body.user_id || !req.body.decks) {
     return res.status(400).send('Error in body of request');
   }
   const user_id = req.body.id;
   const decks = JSON.parse(req.body.decks);
-  return dbHelpers.addMultipleDecksAndUserSpecificsToJoinTable(user_id, decks, res);
+  const result = await dbHelpers.addMultipleDecksAndUserSpecificsToJoinTable(user_id, decks);
+  return result instanceof Error ? res.status(400).send(result) : res.sendStatus(result);
 });
 
-router.post('/v1/decks/addstar', (req, res) => {
+router.post('/v1/decks/addstar', async (req, res) => {
   if (!req.body || !req.body.deck_id) {
     return res.status(400).send('Error in body of request');
   }
   const deck_id = req.body.deck_id;
-  return dbHelpers.addStarToDeckByDeckId(deck_id, res);
+  const result = await dbHelpers.addStarToDeckByDeckId(deck_id);
+  return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
 });
 
-router.post('/v1/decks/addcards', (req, res) => {  // need to test a bit more!
-  console.log(req);
+router.post('/v1/decks/addcards', async (req, res) => {  // need to test a bit more!
   if (!req.body || !req.body.deck_id || !req.body.cardIds) {
     return res.status(400).send('Error in body of request');
   }
   const deck_id = req.body.deck_id;
   const cardIdsArr = req.body.cardIds;
-  console.log('hello!', cardIdsArr, deck_id);
-  return dbHelpers.createCardsForDeckByCardIds(deck_id, cardIdsArr, res);
+  const result = await dbHelpers.createCardsForDeckByCardIds(deck_id, cardIdsArr);
+  return result instanceof Error ? res.status(400).send(result) : res.sendStatus(result);
 });
 
-router.delete('/v1/decks/userid/*/deckid/*/cardid/*', (req, res) => {
+router.delete('/v1/decks/userid/*/deckid/*/cardid/*', async (req, res) => {
   const user_id = req.params[0];
   const deck_id = req.params[1];
   const card_id = req.params[2];
-  return dbHelpers.userRemoveCardFromOwnDeckByDeckId(user_id, deck_id, card_id, res);
+  const result = await dbHelpers.userRemoveCardFromOwnDeckByDeckId(user_id, deck_id, card_id);
+  return result instanceof Error ? res.status(400).send(result) : res.sendStatus(result);
 });
 
-router.delete('/v1/decks/mult/*', (req, res) => {  // needs to delete from user_cards also...
+router.delete('/v1/decks/mult/*', async (req, res) => {  // needs to delete from user_cards also...
   const ids = req.params[0].split('/');
-  return dbHelpers.deleteMultipleDecksByIds(ids, res);
+  const result = await dbHelpers.deleteMultipleDecksByIds(ids);
+  return result instanceof Error ? res.status(400).send(result) : res.sendStatus(result);
 });
 
-router.delete('/v1/cards/*', (req, res) => {  // good, deletes from deck_cards join correctly
+router.delete('/v1/cards/*', async (req, res) => {  // good, deletes from deck_cards join correctly
   const id = req.params[0];
-  return dbHelpers.deleteCardById(id, res);
+  const result = await dbHelpers.deleteCardById(id);
+  return result === 200 ? res.sendStatus(200) : res.sendStatus(400);
 });
 
-router.delete('/v1/decks/*', (req, res) => {
+router.delete('/v1/decks/*', async (req, res) => {
   const id = +req.params[0];
-  return dbHelpers.deleteDeckById(id, res);
+  const result = await dbHelpers.deleteDeckById(id);
+  return result === 200 ? res.sendStatus(200) : res.sendStatus(400);
 });
 
 module.exports = router;
