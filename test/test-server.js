@@ -14,33 +14,12 @@ const expect = chai.expect;
 
 chai.use(chaiHttp);
 describe('Langsnap API server', () => {
-  // before each
-  // create db and tables if not exists
-  // empty all of the tables
 
-  beforeEach(async () => {
-    try {
-      // Relationships
-      User.hasMany(Deck, { onDelete: 'CASCADE' });
-      Card.belongsToMany(Deck, { onDelete: 'CASCADE', through: DeckCard });
-      Card.belongsToMany(User, { onDelete: 'CASCADE', through: UserCard });
-      Deck.belongsTo(User, { onDelete: 'CASCADE' });
-      Deck.belongsToMany(Card, { onDelete: 'CASCADE', through: DeckCard });
-      User.belongsToMany(Card, { onDelete: 'CASCADE', through: UserCard });
-
-      // Perform sync of models with existing database models
-      const syncDb = async () => {
-        await User.sync({ force: true });
-        await Deck.sync({ force: true });
-        await Card.sync({ force: true });
-        await UserCard.sync({ force: true });
-        await DeckCard.sync({ force: true });
-      };
-      syncDb();
-    } catch (err) {
-      console.log('database had an error!');
-    }
-  });
+  const fakeUserData = [];
+  const fakeDeckData = [];
+  const fakeCardData = [];
+  const fakeUserCardData = [];
+  const fakeDeckCardData = [];
 
   describe('tester', () => {
       it('should exist', () => {

@@ -3,7 +3,8 @@ const axios = require('axios');
 const languages = ['en', 'es', 'fr', 'de', 'ja', 'ru'];
 
 module.exports = {
-  sendUrlToGoogleVisionForName: (url, res) => {
+
+  sendUrlToGoogleVisionForName: url =>
     axios({
       method: 'post',
       url: `https://vision.googleapis.com/v1/images:annotate?key=${process.env.GOOGLE_VISION_KEY}`,
@@ -26,12 +27,10 @@ module.exports = {
         ],
       },
     })
-    .then(resp =>
-      res.status(200).send(resp.data.responses[0].labelAnnotations))
-    .catch(err =>
-      res.status(400).send(err));
-  },
-  getGoogleTranslateOfWord: async (q, source, res) => {
+    .then(resp => resp.data.responses[0].labelAnnotations)
+    .catch(err => err),
+
+  getGoogleTranslateOfWord: (q, source) => {
     const langsToGet = languages.filter(lang => lang !== source);
     const promises = [];
     langsToGet.map(lang => promises.push(axios.post(`https://translation.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_VISION}`, {
@@ -39,18 +38,19 @@ module.exports = {
       source,
       target: lang,
     })));
-    axios.all(promises)
+    return axios.all(promises)
       .then(axios.spread((...responses) => {
         const finalResponseObj = { [source]: q };
         responses.map((response, ind) => {
           finalResponseObj[langsToGet[ind]] = response.data.data.translations[0].translatedText;
-          return 'OK';
+          return 200;
         });
-        res.status(200).send(finalResponseObj);
+        return finalResponseObj;
       }))
-      .catch(err => res.status(400).send(err));
+      .catch(err => err);
   },
-  getGoogleTranslateOfSentence: (q, source, target, res) => {
+
+  getGoogleTranslateOfSentence: (q, source, target) =>
     axios.post(`https://translation.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_VISION}`,
       {
         q,
@@ -58,15 +58,15 @@ module.exports = {
         target,
         format: 'text',
       })
-        .then(transData => res.status(200).send(transData.data))
-        .catch(err => res.status(400).send(err));
-  },
-  getSamplePhraseFromWordWordnik: (queryWord, res) => {
+        .then(transData => transData.data)
+        .catch(err => err),
+
+  getSamplePhraseFromWordWordnik: queryWord =>
     axios.get(`http://api.wordnik.com:80/v4/word.json/${queryWord}/examples?includeDuplicates=false&useCanonical=false&skip=0&limit=5&api_key=${process.env.WORDNIK_KEY}`)
-      .then(response => res.status(200).send(response.data))
-      .catch(err => res.status(400).send(err));
-  },
-  getSamplePhraseEnglishFromWordOxford: (queryWord, res) => {
+      .then(response => response.data)
+      .catch(err => err),
+
+  getSamplePhraseEnglishFromWordOxford: queryWord =>
     axios.get(`https://od-api.oxforddictionaries.com:443/api/v1/entries/en/${queryWord}/sentences`, {
       headers: {
         Accept: 'application/json',
@@ -74,7 +74,7 @@ module.exports = {
         app_key: process.env.OXFORD_APP_KEY,
       },
     })
-      .then(response => res.status(200).send(response.data))
-      .catch(err => res.status(400).send(err));
-  },
+      .then(response => response.data)
+      .catch(err => err),
+
 };

@@ -30,42 +30,46 @@ router.get('/v1/users/everything', async (req, res) => {
   return res.status(200).send(data);
 });
 
-router.post('/v1/cloudinaryurltogoogle', (req, res) => {
+router.post('/v1/cloudinaryurltogoogle', async (req, res) => {
   if (!req.body || !req.body.url) {
     return res.status(400).send('Invalid url in body of request');
   }
   const url = req.body.url;
-  console.log(url);
-  return apiHelpers.sendUrlToGoogleVisionForName(url, res);
+  const result = await apiHelpers.sendUrlToGoogleVisionForName(url);
+  return result instanceof Error ? res.status(400).send('Error making request to Google Vision') : res.status(200).send(result);
 });
 
-router.get('/v1/oxford/sentence/word/*', (req, res) => {
+router.get('/v1/oxford/sentence/word/*', async (req, res) => {
   const queryWord = req.params[0];
-  return apiHelpers.getSamplePhraseEnglishFromWordOxford(queryWord, res);
+  const result = await apiHelpers.getSamplePhraseEnglishFromWordOxford(queryWord);
+  return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
 });
 
-router.get('/v1/wordnik/sentence/word/*', (req, res) => {
+router.get('/v1/wordnik/sentence/word/*', async (req, res) => {
   const queryWord = req.params[0];
-  return apiHelpers.getSamplePhraseFromWordWordnik(queryWord, res);
+  const result = await apiHelpers.getSamplePhraseFromWordWordnik(queryWord);
+  return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
 });
 
-router.post('/v1/googletranslate/sentence', (req, res) => {
+router.post('/v1/googletranslate/sentence', async (req, res) => {
   if (!req.body || !req.body.q || !req.body.source || !req.body.target) {
     return res.status(400).send('Error in body of request');
   }
   const q = req.body.q;
   const source = req.body.source;
   const target = req.body.target;
-  return apiHelpers.getGoogleTranslateOfSentence(q, source, target, res);
+  const result = await apiHelpers.getGoogleTranslateOfSentence(q, source, target);
+  return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
 });
 
-router.post('/v1/googletranslate/wordmap', (req, res) => {
+router.post('/v1/googletranslate/wordmap', async (req, res) => {
   if (!req.body || !req.body.q || !req.body.source) {
     return res.status(400).send('Error in body of request');
   }
   const q = req.body.q;
   const source = req.body.source;
-  return apiHelpers.getGoogleTranslateOfWord(q, source, res);
+  const result = await apiHelpers.getGoogleTranslateOfWord(q, source);
+  return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
 });
 
 // testing only delete when done
