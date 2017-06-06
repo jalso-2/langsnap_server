@@ -1,7 +1,7 @@
 language: node_js
 node_js:
   - '7'
-before_install: if [[ `npm -v` != 7* ]]; then npm i -g npm@4; fi
+before_install: if [[ `npm -v` != 4* ]]; then npm i -g npm@4; fi
 cache:
   directories:
     - node_modules
