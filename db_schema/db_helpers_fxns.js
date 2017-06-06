@@ -23,7 +23,7 @@ module.exports = {
       });
       return everything;
     } catch (err) {
-      return err;
+      return 'err';
     }
   },
 
@@ -45,7 +45,7 @@ module.exports = {
       });
       return deck;
     } catch (err) {
-      return err;
+      return 'err';
     }
   },
 
@@ -54,18 +54,11 @@ module.exports = {
       const user = await User.findOne({ where: { facebookUsername: username } });
       return user;
     } catch (err) {
-      return err;
+      return 'err';
     }
   },
 
-  findAndUpdateOrCreateUser: async (
-    facebookUsername,
-    firstName,
-    lastName,
-    token,
-    nativeLang,
-    learnLang,
-    email) => {
+  findAndUpdateOrCreateUser: async (facebookUsername, firstName, lastName, token, nativeLang, learnLang, email) => {
     try {
       let user = await User.findOrCreate({
         where: { facebookUsername },
@@ -79,32 +72,20 @@ module.exports = {
           email,
         },
       });
-      if (!user[1]) {
-        try {
-          user = await User.update({
-            firstName,
-            lastName,
-            token,
-            nativeLang,
-            learnLang,
-            email,
-          }, {
-            where: { facebookUsername },
-          });
-          try {
-            user = await User.findOne({ where: { facebookUsername } });
-            return user;
-          } catch (erro) {
-            return erro;
-          }
-        } catch (error) {
-          return error;
-        }
-      } else {
-        return user[0];
-      }
+      user = await User.update({
+        firstName,
+        lastName,
+        token,
+        nativeLang,
+        learnLang,
+        email,
+      }, {
+        where: { facebookUsername },
+      });
+      user = await User.findOne({ where: { facebookUsername } });
+      return user;
     } catch (err) {
-      return err;
+      return 'err';
     }
   },
 
@@ -122,7 +103,7 @@ module.exports = {
       });
       return decks;
     } catch (err) {
-      return err;
+      return 'err';
     }
   },
 
@@ -144,7 +125,7 @@ module.exports = {
       }
       return decks[0];
     } catch (err) {
-      return err;
+      return 'err';
     }
   },
 
@@ -167,7 +148,7 @@ module.exports = {
       });
       return decks;
     } catch (err) {
-      return err;
+      return 'err';
     }
   },
 
@@ -179,26 +160,28 @@ module.exports = {
     };
     const timeIntervalMultiplier = userMultFactor[answer];
     try {
+      console.log('going!');
       const currentDeckCard = await DeckCard.findOne({ where: { deck_id, card_id } });
+      console.log('and going!!!');
       await DeckCard.update({
         timeInterval: currentDeckCard.timeInterval * timeIntervalMultiplier,
         lastVisited: (new Date()).toISOString(),
       }, { where: { deck_id, card_id } });
+      console.log('annnnnddddd gone!!!!');
       return {};
     } catch (err) {
-      return err;
+      return 'err';
     }
   },
 
   addStarToDeckByDeckId: async (deck_id) => {
     try {
       const deck = await Deck.findOne({ where: { id: deck_id } });
-      console.log('sent invalid deck', deck);
       Deck.update({ stars: deck.stars + 1 }, { where: { id: deck_id } });
       deck.stars = deck.stars + 1;
       return deck;
     } catch (err) {
-      return err;
+      return 'err';
     }
   },
 
@@ -213,12 +196,11 @@ module.exports = {
             attributes: ['wordMap'],
           },
         }],
-        // attributes: ['id', 'imgUrl', 'stars'],
         where: {},
       });
       return cards;
     } catch (err) {
-      return err;
+      return 'err';
     }
   },
 
@@ -227,7 +209,7 @@ module.exports = {
       const deck = await Deck.create({ name, user_id, stars });
       return deck;
     } catch (err) {
-      return err;
+      return 'err';
     }
   },
 
@@ -245,7 +227,7 @@ module.exports = {
       });
       return card;
     } catch (err) {
-      return err;
+      return 'err';
     }
   },
 
@@ -278,6 +260,7 @@ module.exports = {
   },
 
   addMultipleDecksAndUserSpecificsToJoinTable: async (user_id, decks) => {
+    console.log(user_id, 'this your userid');
     try {
       await Promise.all(decks.map(async (deckId) => {
         const origDeck = await Deck.findOne({ where: { id: deckId } });
@@ -300,7 +283,7 @@ module.exports = {
       }));
       return 200;
     } catch (err) {
-      return err;
+      return 'err';
     }
   },
 
@@ -309,30 +292,23 @@ module.exports = {
       const deck = await Deck.findOne({ where: { id: deck_id } });
       await Promise.all(cardIdsArr.map(async (card_id) => {
         const card = await Card.findOne({ where: { id: card_id } });
-        const newCard = await Card.create({
-          stars: 0,
-          wordMap: card.wordMap,
-          imgUrl: card.imgUrl,
-        });
         const joinTableEntry = await DeckCard.findOne({
           where: {
             card_id,
           },
         });
-        console.log(joinTableEntry, 'did the join table query, keep looking!');
         await deck.addCard(card, {
-          timeInterval: 3000,
+          timeInterval: 900000,
           phrase: joinTableEntry.phrase,
           lastVisited: (new Date()).toISOString(),
-          card_id: newCard.card_id,
+          card_id,
         });
-        console.log('returning ok now!');
-        await newCard.addUser(deck.user_id);
+        await card.addUser(deck.user_id);
         return 200;
       }));
       return 200;
     } catch (err) {
-      return err;
+      return 'err';
     }
   },
 
@@ -345,13 +321,14 @@ module.exports = {
         const joinEntries = await DeckCard.findAll({ where: { deck_id: +deck_id } });
         cardsToRemoveFromUser = cardsToRemoveFromUser.concat(joinEntries.map(entry => entry.card_id));
         await DeckCard.destroy({ where: { deck_id: +deck_id } });
+        await Deck.destroy({ where: { id: deck_id } });
       }));
       await Promise.all(cardsToRemoveFromUser.map(async (card_id) => {
         await UserCard.destroy({ where: { user_id, card_id } });
       }));
       return 200;
     } catch (err) {
-      return err;
+      return 'err';
     }
   },
 
@@ -361,7 +338,7 @@ module.exports = {
       await UserCard.destroy({ where: { user_id, card_id } });
       return 200;
     } catch (err) {
-      return err;
+      return 'err';
     }
   },
 };

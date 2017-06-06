@@ -28,12 +28,12 @@ module.exports = {
       },
     })
     .then(resp => resp.data.responses[0].labelAnnotations)
-    .catch(err => err),
+    .catch(() => 'err'),
 
   getGoogleTranslateOfWord: (q, source) => {
     const langsToGet = languages.filter(lang => lang !== source);
     const promises = [];
-    langsToGet.map(lang => promises.push(axios.post(`https://translation.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_VISION}`, {
+    langsToGet.map(lang => promises.push(axios.post(`https://translation.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_VISION_KEY}`, {
       q,
       source,
       target: lang,
@@ -47,11 +47,11 @@ module.exports = {
         });
         return finalResponseObj;
       }))
-      .catch(err => err);
+      .catch(() => 'err');
   },
 
   getGoogleTranslateOfSentence: (q, source, target) =>
-    axios.post(`https://translation.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_VISION}`,
+    axios.post(`https://translation.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_VISION_KEY}`,
       {
         q,
         source,
@@ -59,12 +59,12 @@ module.exports = {
         format: 'text',
       })
         .then(transData => transData.data)
-        .catch(err => err),
+        .catch(() => 'err'),
 
   getSamplePhraseFromWordWordnik: queryWord =>
     axios.get(`http://api.wordnik.com:80/v4/word.json/${queryWord}/examples?includeDuplicates=false&useCanonical=false&skip=0&limit=5&api_key=${process.env.WORDNIK_KEY}`)
       .then(response => response.data)
-      .catch(err => err),
+      .catch(() => 'err'),
 
   getSamplePhraseEnglishFromWordOxford: queryWord =>
     axios.get(`https://od-api.oxforddictionaries.com:443/api/v1/entries/en/${queryWord}/sentences`, {
@@ -75,6 +75,6 @@ module.exports = {
       },
     })
       .then(response => response.data)
-      .catch(err => err),
+      .catch(() => 'err'),
 
 };
