@@ -9,9 +9,7 @@
   "scripts": {
     "test": "mocha test/test-server.js",
     "start": "node server.js",
-    "dev": "nodemon server.js",
-    "pretest": "npm run lint",
-    "lint": "eslint . --ext .json .md"
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "James Goedert, Jeralnisha Franklin, Zachary Bergmann",
