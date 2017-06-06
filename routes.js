@@ -22,44 +22,54 @@ router.post('/v2/*', (req, res) => {
   return res.sendStatus(200);
 });
 
-router.get('/v1/users/everything', (req, res) => dbHelpers.userGetItAll(res));
+router.get('/v1/users/everything', async (req, res) => {
+  const data = await dbHelpers.userGetItAll();
+  if (data instanceof Error) {
+    return res.status(400).send(data);
+  }
+  return res.status(200).send(data);
+});
 
-router.post('/v1/cloudinaryurltogoogle', (req, res) => {
+router.post('/v1/cloudinaryurltogoogle', async (req, res) => {
   if (!req.body || !req.body.url) {
     return res.status(400).send('Invalid url in body of request');
   }
   const url = req.body.url;
-  console.log(url);
-  return apiHelpers.sendUrlToGoogleVisionForName(url, res);
+  const result = await apiHelpers.sendUrlToGoogleVisionForName(url);
+  return typeof result === 'string' ? res.status(400).send('Error, please follow request body format') : res.status(200).send(result);
 });
 
-router.get('/v1/oxford/sentence/word/*', (req, res) => {
+router.get('/v1/oxford/sentence/word/*', async (req, res) => {
   const queryWord = req.params[0];
-  return apiHelpers.getSamplePhraseEnglishFromWordOxford(queryWord, res);
+  const result = await apiHelpers.getSamplePhraseEnglishFromWordOxford(queryWord);
+  return typeof result === 'string' ? res.status(400).send('Error, please follow request format') : res.status(200).send(result);
 });
 
-router.get('/v1/wordnik/sentence/word/*', (req, res) => {
+router.get('/v1/wordnik/sentence/word/*', async (req, res) => {
   const queryWord = req.params[0];
-  return apiHelpers.getSamplePhraseFromWordWordnik(queryWord, res);
+  const result = await apiHelpers.getSamplePhraseFromWordWordnik(queryWord);
+  return typeof result === 'string' ? res.status(400).send('Error, please follow request format') : res.status(200).send(result);
 });
 
-router.post('/v1/googletranslate/sentence', (req, res) => {
+router.post('/v1/googletranslate/sentence', async (req, res) => {
   if (!req.body || !req.body.q || !req.body.source || !req.body.target) {
-    return res.status(400).send('Error in body of request');
+    return res.status(400).send('Error, please follow request body format');
   }
   const q = req.body.q;
   const source = req.body.source;
   const target = req.body.target;
-  return apiHelpers.getGoogleTranslateOfSentence(q, source, target, res);
+  const result = await apiHelpers.getGoogleTranslateOfSentence(q, source, target);
+  return typeof result === 'string' ? res.status(400).send('Error, please follow request body format') : res.status(200).send(result);
 });
 
-router.post('/v1/googletranslate/wordmap', (req, res) => {
+router.post('/v1/googletranslate/wordmap', async (req, res) => {
   if (!req.body || !req.body.q || !req.body.source) {
     return res.status(400).send('Error in body of request');
   }
   const q = req.body.q;
   const source = req.body.source;
-  return apiHelpers.getGoogleTranslateOfWord(q, source, res);
+  const result = await apiHelpers.getGoogleTranslateOfWord(q, source);
+  return typeof result === 'string' ? res.status(400).send(result) : res.status(200).send(result);
 });
 
 // testing only delete when done
@@ -68,11 +78,12 @@ router.get('/v1/users/all', async (req, res) => {
   return res.status(200).send(user);
 });
 
-router.get('/v1/users/auth/*/*', (req, res) => {
+router.get('/v1/users/auth/*/*', async (req, res) => {
   const socialLoginSource = req.params[0];
   const username = decodeURI(req.params[1]);
   if (socialLoginSource === 'facebook') {
-    return dbHelpers.findUserIfExistsBySocialId(socialLoginSource, username, res);
+    const result = await dbHelpers.findUserIfExistsBySocialId(socialLoginSource, username);
+    return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
   }
   return res.sendStatus(400);
 });
@@ -85,47 +96,57 @@ router.post('/v1/users/findorcreate', async (req, res) => {
   const nativeLang = req.body.nativeLang;
   const learnLang = req.body.learnLang;
   const email = req.body.email;
-  return dbHelpers.findAndUpdateOrCreateUser(
+  const result = await dbHelpers.findAndUpdateOrCreateUser(
     facebookUsername,
     firstName,
     lastName,
     token,
     nativeLang,
     learnLang,
-    email,
-    res);
+    email);
+  return typeof result === 'string' ? res.status(400).send('Error finding or creating a user') : res.status(200).send(result);
 });
 
-router.get('/v1/decks/all', (req, res) => dbHelpers.getAllDecks(res)); // getting cards array, why? seeded data?
+router.get('/v1/decks/all', async (req, res) => {
+  const result = await dbHelpers.getAllDecks(); // getting cards array, why? seeded data?
+  return typeof result === 'string' ? res.status(400).send('Error querying for deck information') : res.status(200).send(result);
+});
 
-router.get('/v1/decks/deckid/*', (req, res) => {  // good!
+router.get('/v1/decks/deckid/*', async (req, res) => {  // good!
   const id = +req.params[0];
-  return dbHelpers.getDeckByDeckId(id, res);
+  const result = await dbHelpers.getDeckByDeckId(id);
+  return typeof result === 'string' ? res.status(400).send('Error querying for a deck') : res.status(200).send(result);
 });
 
-router.get('/v1/decks/userid/*', (req, res) => {  // good!
+router.get('/v1/decks/userid/*', async (req, res) => {  // good!
   const id = +req.params[0];
-  return dbHelpers.getDeckByUserId(id, res);
+  const result = await dbHelpers.getDeckByUserId(id);
+  return typeof result === 'string' ? res.status(400).send('Error looking for decks') : res.status(200).send(result);
 });
 
-router.get('/v1/cards/all', (req, res) => dbHelpers.getAllCards(res));  // good
+router.get('/v1/cards/all', async (req, res) => {
+  const result = await dbHelpers.getAllCards();  // good
+  return typeof result === 'string' ? res.status(400).send('Error finding all cards') : res.status(200).send(result);
+});
 
-router.get('/v1/cards/deckid/*', (req, res) => {  // need to test with proper data again
+router.get('/v1/cards/deckid/*', async (req, res) => {  // need to test with proper data again
   const id = +req.params[0];
-  return dbHelpers.getAllCardsFromDeckByDeckId(id, res);
+  const result = await dbHelpers.getAllCardsFromDeckByDeckId(id);
+  return typeof result === 'string' ? res.status(400).send('Error getting cards for a deck') : res.status(200).send(result);
 });
 
-router.post('/v1/decks/new', (req, res) => {  // good!
+router.post('/v1/decks/new', async (req, res) => {  // good!
   if (!req.body || !req.body.name || !req.body.user_id || !req.body.stars) {
     return res.status(400).send('Error in body of request');
   }
   const name = req.body.name;
   const user_id = req.body.user_id;
   const stars = req.body.stars;
-  return dbHelpers.userCreateNewDeck(name, user_id, stars, res);
+  const result = await dbHelpers.userCreateNewDeck(name, user_id, stars);
+  return typeof result === 'string' ? res.status(400).send('Error creating a new deck') : res.status(200).send(result);
 });
 
-router.post('/v1/cards/addcard', (req, res) => { // working! leave it def for now!!!
+router.post('/v1/cards/addcard', async (req, res) => { // working! leave it def for now!!!
   if (!req.body || !req.body.user_id || !req.body.imgUrl || !req.body.wordMap || !req.body.deck_id) {
     return res.status(400).send('Error in body of request');
   }
@@ -133,67 +154,74 @@ router.post('/v1/cards/addcard', (req, res) => { // working! leave it def for no
   const imgUrl = req.body.imgUrl;
   const wordMap = req.body.wordMap;
   const deck_id = req.body.deck_id;
-  return dbHelpers.userAddCreatedCardToDeck(user_id, imgUrl, wordMap, deck_id, res);
+  const result = await dbHelpers.userAddCreatedCardToDeck(user_id, imgUrl, wordMap, deck_id);
+  return typeof result === 'string' ? res.status(400).send('Error adding a card') : res.status(200).send(result);
 });
 
-router.post('/v1/cards/paginganswer', (req, res) => {
+router.post('/v1/cards/paginganswer', async (req, res) => {  // issues
   if (!req.body || !req.body.card_id || !req.body.deck_id || !req.body.answer) {
     return res.status(400).send('Error in body of request');
   }
   const deck_id = req.body.deck_id;
   const card_id = req.body.card_id;
   const answer = req.body.answer;
-  return dbHelpers.userAnswerToCardWhilePaging(deck_id, card_id, answer, res);
+  const result = await dbHelpers.userAnswerToCardWhilePaging(deck_id, card_id, answer);
+  return typeof result === 'string' ? res.status(400).send('Error rating a card') : res.status(200).send(result);
 });
 
-router.post('/v1/decks/adddecks', (req, res) => {  // I think this one works!
-  if (!req.body || !req.body.user_id || !req.body.decks) {
+router.post('/v1/decks/adddecks', async (req, res) => {
+  if (!req.body || !req.body.id || !req.body.decks) {
     return res.status(400).send('Error in body of request');
   }
   const user_id = req.body.id;
   const decks = JSON.parse(req.body.decks);
-  return dbHelpers.addMultipleDecksAndUserSpecificsToJoinTable(user_id, decks, res);
+  const result = await dbHelpers.addMultipleDecksAndUserSpecificsToJoinTable(user_id, decks);
+  return typeof result === 'string' ? res.status(400).send('Error adding decks') : res.status(200).send('OK');
 });
 
-router.post('/v1/decks/addstar', (req, res) => {
+router.post('/v1/decks/addstar', async (req, res) => {
   if (!req.body || !req.body.deck_id) {
     return res.status(400).send('Error in body of request');
   }
   const deck_id = req.body.deck_id;
-  return dbHelpers.addStarToDeckByDeckId(deck_id, res);
+  const result = await dbHelpers.addStarToDeckByDeckId(deck_id);
+  return typeof result === 'string' ? res.status(400).send('Error adding likes to deck') : res.status(200).send(result);
 });
 
-router.post('/v1/decks/addcards', (req, res) => {  // need to test a bit more!
-  console.log(req);
+router.post('/v1/decks/addcards', async (req, res) => {
   if (!req.body || !req.body.deck_id || !req.body.cardIds) {
     return res.status(400).send('Error in body of request');
   }
   const deck_id = req.body.deck_id;
   const cardIdsArr = req.body.cardIds;
-  console.log('hello!', cardIdsArr, deck_id);
-  return dbHelpers.createCardsForDeckByCardIds(deck_id, cardIdsArr, res);
+  const result = await dbHelpers.createCardsForDeckByCardIds(deck_id, cardIdsArr);
+  return typeof result === 'string' ? res.status(400).send('Error adding cards to deck') : res.sendStatus(result);
 });
 
-router.delete('/v1/decks/userid/*/deckid/*/cardid/*', (req, res) => {
+router.delete('/v1/decks/userid/*/deckid/*/cardid/*', async (req, res) => {
   const user_id = req.params[0];
   const deck_id = req.params[1];
   const card_id = req.params[2];
-  return dbHelpers.userRemoveCardFromOwnDeckByDeckId(user_id, deck_id, card_id, res);
+  const result = await dbHelpers.userRemoveCardFromOwnDeckByDeckId(user_id, deck_id, card_id);
+  return typeof result === 'string' ? res.status(400).send('Error deleting card') : res.sendStatus(result);
 });
 
-router.delete('/v1/decks/mult/*', (req, res) => {  // needs to delete from user_cards also...
+router.delete('/v1/decks/mult/*', async (req, res) => {
   const ids = req.params[0].split('/');
-  return dbHelpers.deleteMultipleDecksByIds(ids, res);
+  const result = await dbHelpers.deleteMultipleDecksByIds(ids);
+  return typeof result === 'string' ? res.status(400).send('Error deleting decks') : res.sendStatus(result);
 });
 
-router.delete('/v1/cards/*', (req, res) => {  // good, deletes from deck_cards join correctly
+router.delete('/v1/cards/*', async (req, res) => {
   const id = req.params[0];
-  return dbHelpers.deleteCardById(id, res);
+  const result = await dbHelpers.deleteCardById(id);
+  return result === 200 ? res.sendStatus(200) : res.sendStatus(400);
 });
 
-router.delete('/v1/decks/*', (req, res) => {
+router.delete('/v1/decks/*', async (req, res) => {
   const id = +req.params[0];
-  return dbHelpers.deleteDeckById(id, res);
+  const result = await dbHelpers.deleteDeckById(id);
+  return result === 200 ? res.sendStatus(200) : res.sendStatus(400);
 });
 
 module.exports = router;
