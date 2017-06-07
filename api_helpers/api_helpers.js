@@ -30,6 +30,32 @@ module.exports = {
     .then(resp => resp.data.responses[0].labelAnnotations)
     .catch(() => 'err'),
 
+  sendUrlToGoogleVisionForOCR: url =>
+    axios({
+      method: 'post',
+      url: `https://vision.googleapis.com/v1/images:annotate?key=${process.env.GOOGLE_VISION_KEY}`,
+      data: {
+        requests: [
+          {
+            image: {
+              source: {
+                imageUri:
+                  url,
+              },
+            },
+            features: [
+              {
+                type: 'TEXT_DETECTION',
+                maxResults: 1,
+              },
+            ],
+          },
+        ],
+      },
+    })
+    .then(resp => resp.data.responses[0].textAnnotations[0].description)
+    .catch(() => 'err'),
+
   getGoogleTranslateOfWord: (q, source) => {
     const langsToGet = languages.filter(lang => lang !== source);
     const promises = [];

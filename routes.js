@@ -36,7 +36,16 @@ router.post('/v1/cloudinaryurltogoogle', async (req, res) => {
   }
   const url = req.body.url;
   const result = await apiHelpers.sendUrlToGoogleVisionForName(url);
-  return typeof result === 'string' ? res.status(400).send('Error, please follow request body format') : res.status(200).send(result);
+  return typeof result === 'string' ? res.status(400).send('Error, Google Vision did not handle your request properly') : res.status(200).send(result);
+});
+
+router.post('/v1/googleocr', async (req, res) => {
+  if (!req.body || !req.body.url) {
+    return res.status(400).send('Invalid url in body of request');
+  }
+  const url = req.body.url;
+  const result = await apiHelpers.sendUrlToGoogleVisionForOCR(url);
+  return result === 'err' ? res.status(400).send('Error, Google OCR did not handle your request properly') : res.status(200).send(result);
 });
 
 router.get('/v1/oxford/sentence/word/*', async (req, res) => {

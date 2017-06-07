@@ -160,14 +160,11 @@ module.exports = {
     };
     const timeIntervalMultiplier = userMultFactor[answer];
     try {
-      console.log('going!');
       const currentDeckCard = await DeckCard.findOne({ where: { deck_id, card_id } });
-      console.log('and going!!!');
       await DeckCard.update({
         timeInterval: currentDeckCard.timeInterval * timeIntervalMultiplier,
         lastVisited: (new Date()).toISOString(),
       }, { where: { deck_id, card_id } });
-      console.log('annnnnddddd gone!!!!');
       return {};
     } catch (err) {
       return 'err';
@@ -260,7 +257,6 @@ module.exports = {
   },
 
   addMultipleDecksAndUserSpecificsToJoinTable: async (user_id, decks) => {
-    console.log(user_id, 'this your userid');
     try {
       await Promise.all(decks.map(async (deckId) => {
         const origDeck = await Deck.findOne({ where: { id: deckId } });
