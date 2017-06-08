@@ -92,7 +92,7 @@ router.get('/v1/users/auth/*/*', async (req, res) => {
   const username = decodeURI(req.params[1]);
   if (socialLoginSource === 'facebook') {
     const result = await dbHelpers.findUserIfExistsBySocialId(socialLoginSource, username);
-    return result instanceof Error ? res.status(400).send(result) : res.status(200).send(result);
+    return typeof result === 'string' ? res.status(400).send('Error checking user authentication') : res.status(200).send(result);
   }
   return res.sendStatus(400);
 });
