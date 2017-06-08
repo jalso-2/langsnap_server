@@ -52,7 +52,7 @@ module.exports = {
   findUserIfExistsBySocialId: async (socialLoginSource, username) => {
     try {
       const user = await User.findOne({ where: { facebookUsername: username } });
-      return user;
+      return user || {};
     } catch (err) {
       return 'err';
     }
