@@ -85,6 +85,7 @@ To install the application and get contribution ready:
   - npm i -g ionic cordova
   - create a config.ts file inside of the src folder in the repo. This should have the following format:
 
+```sh
 import { Injectable } from ‘@angular/core’;
 
 @Injectable()
@@ -100,6 +101,7 @@ export class Config {
     }
     public serverUrl = ‘server_url’;
 }
+```
 
 (Fill in the appId, scope, cloudId, uploadPreset, and serverUrl VALUES to be properly configured)
 
@@ -133,12 +135,13 @@ docker-compose.yml file should look similar to the following but should have the
 Keep in mind that during development the database url and other credentials may be acceptable but should be 
 changed for more secure values when moving to production.
 
+```sh
 version: "2"
 
 services:
-  langsnap_server: 
+  langsnap_server:
     image: username/reponame
-    ports: 
+    ports:
       - 80:80
     command: bash -c 'while ! </dev/tcp/db/5432; do sleep 1; done; npm start;'
     depends_on:
@@ -157,7 +160,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=langsnap
-
+```
 
 Once this file has been copied and pasted into the deployed environment, docker and docker-compose should be installed
 there as well. Once this is done, deployment is done by running the following commands:
