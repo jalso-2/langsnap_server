@@ -46,7 +46,6 @@ module.exports = {
             features: [
               {
                 type: 'TEXT_DETECTION',
-                maxResults: 1,
               },
             ],
           },

@@ -457,7 +457,7 @@ POST /v1/decks/adddecks  Used to copy multiple decks from another user to add th
 
 Request Body Format: 
 {
-	"user_id":4,
+	"id":4,
 	"decks":"[3,4]"
 }
 
